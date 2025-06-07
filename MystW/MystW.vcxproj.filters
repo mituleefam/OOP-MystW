@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{dcfdbf96-87a0-490a-8143-17737d47d74f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Entity">
+      <UniqueIdentifier>{1709d57b-6786-4987-b609-fa3d1eccceb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Background">
+      <UniqueIdentifier>{6989f68f-0acd-4ba9-9443-24391c7ef5bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
