@@ -100,19 +100,8 @@ void Player::Update(float deltaTime)
 				// Reset to the last frame if animation is still playing
 				sprite.setTextureRect(dieFrames[dieFrameCount - 1]);
 			}
-			//else {
-			//	// No frames, hide the sprite or set a flag
-			//	sprite.setColor(sf::Color(255, 255, 255, 0)); // Hide sprite
-			//}
 		}
-		//else {
-		//	// Animation finished, hide the sprite or set a flag
-		//	sprite.setColor(sf::Color(255, 255, 255, 0));
-		//	// Or use a flag for other logic
-		//}
-
 		velocity.x = 0.f; // Stop horizontal movement
-
 		return;
 	}
 
@@ -127,8 +116,17 @@ void Player::Update(float deltaTime)
 	}
 
 	// Handle input and state transitions
-
 	if (animState != AnimationState::Hurting && !isAttacking) {
+		velocity.x = 0.0f;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+			velocity.x += moveSpeed;
+			isFacingRight = true;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+			velocity.x -= moveSpeed;
+			isFacingRight = false;
+		}
+
 		if ((sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) && !isJumping) {
 			animState = AnimationState::Running;
 		}
@@ -150,18 +148,20 @@ void Player::Update(float deltaTime)
 			isAttacking = true;
 			attackRegistered = false;
 			attackCooldown = attackCooldownDuration;
-
-			currentFrame = 0;         // <<-- ADDED: Ensure attack animation restarts
-			animationTimer = 0.0f;    // <<-- ADDED: Ensure attack animation timer restarts
+			currentFrame = 0;
+			animationTimer = 0.0f;
 		}
 	}
+	else {
+		velocity.x = 0.0f;
+	}
 
+	// ------ ANIMMATION ------
 	// Reset frame if state changed
 	if (animState != prevAnimState) {
 		currentFrame = 0;
 		prevAnimState = animState;
 	}
-
 	// Animation frame update
 	int frameCount = 1;
 	float actualFrameDuration = frameDuration;
@@ -222,52 +222,20 @@ void Player::Update(float deltaTime)
 		break;
 	}
 
-	// Prevent movement while attacking or hurting
-	if (!isAttacking && animState != AnimationState::Hurting) {
-		velocity.x = 0.0f;
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-			velocity.x += moveSpeed;
-			isFacingRight = true;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-			velocity.x -= moveSpeed;
-			isFacingRight = false;
-		}
-	}
-	else {
-		velocity.x = 0.0f;
-	} // if use knockBackForce: comment this and uncomment in takeDamage
-
+	// ------ PHYSICS ------
 	// Set scale and origin based on facing direction
 	float originX = isFacingRight ? 20.0f : 25.0f;
 	sprite.setOrigin(originX, 18.5f);
 	sprite.setScale(isFacingRight ? 5.0f : -5.0f, 5.0f);
 
 	// Gravity
-	velocity.y += gravity;
-	sprite.move(velocity);
-
-	// Check enemy collision
-	//sf::FloatRect playerBounds = getHitBox();
-	//sf::FloatRect enemyBounds = enemy.getHitBox();
-	//if (playerBounds.intersects(enemyBounds))
-	//{
-	//	// Push the player away from the enemy
-	//	if (sprite.getPosition().x < enemy.getPosition().x)
-	//		sprite.setPosition(enemyBounds.left - playerBounds.width / 2.f, sprite.getPosition().y);
-	//	else
-	//		sprite.setPosition(enemyBounds.left + enemyBounds.width + playerBounds.width / 2.f, sprite.getPosition().y);
-	//	velocity.x = 0.0f; // Stop horizontal movement on collision
-	//	return; // Exit early to prevent further processing
-	//}
-	//float px = sprite.getPosition().x;
-	//float py = sprite.getPosition().y;
-	//float minX = 0 + playerBounds.width / 2.f;
-	//float maxX = 1920 - playerBounds.width / 2.f; // 1920 is window width
-	//if (px < minX) px = minX;
-	//if (px > maxX) px = maxX;
-	//sprite.setPosition(px, py);
-
+	if (animState == AnimationState::AirAttacking) {
+		velocity.y += fastFallGravity * deltaTime;
+	}
+	else {
+		velocity.y += gravity * deltaTime;
+	}
+	sprite.move(velocity * deltaTime);
 
 	// Ground collision
 	if (sprite.getPosition().y >= groundY) {

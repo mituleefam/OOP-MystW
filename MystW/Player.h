@@ -13,9 +13,10 @@ private:
 
     sf::Vector2f velocity; // Horizontal and vertical velocity
     bool isJumping = false;
-    const float jumpSpeed = 10.0f;
-    const float moveSpeed = 7.0f; // Speed of horizontal movement
-    const float gravity = 0.15f;
+    const float jumpSpeed = 900.0f;
+    const float moveSpeed = 600.0f; // Speed of horizontal movement
+    const float gravity = 1600.0f;
+	const float fastFallGravity = 3000.0f; // Gravity when fast falling
     const float groundY = 700.0f; // Same as the initial position of the player sprite
 
     bool isAttacking = false;
@@ -28,11 +29,11 @@ private:
     int currentFrame = 0;
     float animationTimer = 0.0f;
     float frameDuration = 0.2f; // seconds per frame
-    sf::IntRect idleFrames[4]; // array of frame rects
+	// Animation frame rectangles
+    sf::IntRect idleFrames[4];
     sf::IntRect runningFrames[6];
-    sf::IntRect jumpingFrames[4];
-    //sf::IntRect handAttackingFrames[3];  
-	sf::IntRect airAttackingFrames[7]; // Frames for air attack
+    sf::IntRect jumpingFrames[4]; 
+	sf::IntRect airAttackingFrames[7];
     sf::IntRect swordAttackingFrames[11];
     sf::IntRect hurtingFrames[3];
     sf::IntRect dieFrames[6];

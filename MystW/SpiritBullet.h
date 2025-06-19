@@ -19,12 +19,13 @@ public:
     void update(float deltaTime);
     void draw(sf::RenderWindow& window) const;
     sf::FloatRect getGlobalBounds() const;
+	sf::Vector2f getPosition() const;
 
     // Public flag to check if the bullet should be removed.
     bool isAlive = true;
 
 private:
-    sf::RectangleShape shape;
+    sf::CircleShape shape;
     sf::Vector2f velocity;
     float lifetime; // To remove bullets that fly too far or exist for too long.
 };

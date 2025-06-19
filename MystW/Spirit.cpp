@@ -6,7 +6,7 @@
 Spirit::Spirit()
     : bIsActive(false),       // Start as inactive.
     animationTimer(0.0f),
-    attackInterval(0.8f),   // Fires one bullet every 0.8 seconds.
+    attackInterval(1.8f),   // Fires one bullet every 1.8 seconds.
     detectionRange(800.0f), // Can detect enemies up to 800 pixels away.
     currentTarget(nullptr)
 {
@@ -55,7 +55,8 @@ void Spirit::update(float deltaTime, const sf::Vector2f& playerPosition, std::ve
         if (!bullet.isAlive) continue; // Skip bullets already marked for deletion.
 
         for (const auto& enemy : enemies) {
-            if (enemy && !enemy->isDead() && bullet.getGlobalBounds().intersects(enemy->getHitBox())) {
+            sf::Vector2f bulletCenter = bullet.getPosition();
+            if (enemy && !enemy->isDead() && enemy->getHitBox().contains(bulletCenter)) {
                 enemy->takeDamage(1);      // The spirit's damage.
                 bullet.isAlive = false;    // Destroy the bullet on impact.
                 break; // A single bullet can only hit one enemy.
@@ -107,7 +108,7 @@ void Spirit::updateAnimation(float deltaTime) {
 
 void Spirit::updatePosition(const sf::Vector2f& playerPosition) {
     // Define the desired hover position relative to the player.
-    sf::Vector2f targetPos = playerPosition + sf::Vector2f(-100.0f, -100.0f);
+    sf::Vector2f targetPos = playerPosition + sf::Vector2f(-50.0f, -50.0f);
 
     // Smoothly move towards the target position using interpolation for a "floaty" effect.
     sf::Vector2f currentPos = sprite.getPosition();

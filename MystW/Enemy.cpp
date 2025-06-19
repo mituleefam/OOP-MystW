@@ -172,12 +172,13 @@ sf::FloatRect Enemy::getBounds() const {
 sf::FloatRect Enemy::getHitBox() const {
     // Generic hitbox calculation, can be overridden by derived classes if needed
     sf::FloatRect box = sprite.getGlobalBounds();
-    float shrinkHorizontal = 0.7f; // Shrink more horizontally for a taller sprite
-    float shrinkVertical = 0.4f;   // Shrink less vertically
+    float shrinkHorizontal = 0.5f; // Shrink more horizontally for a taller sprite
+    float shrinkVertical = 0.2f;   // Shrink less vertically
 
     box.left += box.width * (1.0f - shrinkHorizontal) / 2.0f;
     box.width *= shrinkHorizontal;
-    box.top += box.height * (1.0f - shrinkVertical) / 2.0f;
+    //box.top += box.height * (1.0f - shrinkVertical) / 2.0f;
+    box.top += box.height * 0.7f; // lower multiplicant if aim higher
     box.height *= shrinkVertical;
     return box;
 }

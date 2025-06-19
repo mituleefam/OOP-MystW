@@ -3,7 +3,7 @@
 SpiritBullet::SpiritBullet(sf::Vector2f startPos, sf::Vector2f direction, float speed)
     : lifetime(5.0f) // Bullet will exist for a maximum of 5 seconds.
 {
-    shape.setSize(sf::Vector2f(12.0f, 12.0f));
+    shape = sf::CircleShape(5.0f);
     shape.setFillColor(sf::Color::Cyan);
     shape.setOrigin(6.0f, 6.0f); // Center the origin for proper rotation/scaling if needed later
     shape.setPosition(startPos);
@@ -26,4 +26,8 @@ void SpiritBullet::draw(sf::RenderWindow& window) const {
 
 sf::FloatRect SpiritBullet::getGlobalBounds() const {
     return shape.getGlobalBounds();
+}
+
+sf::Vector2f SpiritBullet::getPosition() const {
+    return shape.getPosition();
 }

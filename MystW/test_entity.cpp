@@ -13,7 +13,18 @@ int main()
     //---------- INITIALIZE ----------
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8; // Enable anti-aliasing for smoother edges
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "Game", sf::Style::Default, settings);
+
+	// Get the desktop resolution
+    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    unsigned int realWidth = desktop.width;
+    unsigned int realHeight = desktop.height;
+
+    std::cout << "Desktop resolution: " << realWidth << " x " << realHeight << "\n";
+	// Create a fullscreen window with the desktop resolution
+    sf::RenderWindow window(sf::VideoMode(realWidth, realHeight), "Game", sf::Style::Default);
+    sf::View view(sf::FloatRect(0, 0, 1920, 1080)); // logic size
+    window.setView(view);
+
     //---------- INITIALIZE ----------
 
     Player player;
@@ -27,16 +38,22 @@ int main()
 
     std::vector<std::unique_ptr<Enemy>> enemies; // This remains the same! Polymorphism at work.
     // Create an Elf instance
-    enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 1800.0f, 800.0f));
-    // To add another Elf:
-    // enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 1500.0f, 750.0f));
+    enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 2000.0f, 800.0f));
+    enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 2200.0f, 800.0f));
+
     // In the future, to add a Goblin (assuming Goblin class exists and inherits Enemy):
     // enemies.emplace_back(std::make_unique<Goblin>("Assets/Enemy/Goblin/Textures", 1000.0f, 800.0f));
 
 
     while (window.isOpen())
     {
-        // ... (event polling) ...
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+            // Optionally handle other events (resize window, key, etc.)
+        }
+        
         float deltaTime = clock.restart().asSeconds();
 
         // --- EXAMPLE OF ACTIVATING THE SPIRIT ---
@@ -75,7 +92,7 @@ int main()
                 // Option 1: Dynamic cast (safer)
                 if (Elf* elf = dynamic_cast<Elf*>(currentEnemy)) {
                     if (elf->checkArrowCollisions(player.getHitBox())) {
-                        player.takeDamage(10);
+                        player.takeDamage(5);
                         elf->removeArrowsCollidingWith(player.getHitBox());
                         std::cout << "Player hit by Elf arrow!" << std::endl;
                     }
@@ -94,16 +111,13 @@ int main()
                 ++it;
             }
         }
-        //spirit.Update(deltaTime, window, enemies, player); // Pass vector of enemies if spirit interacts with multiple
-
-		spirit.draw(window); // Draw the spirit if active
 
         window.clear(sf::Color::Black);
         window.draw(player.sprite);
         for (const auto& enemy : enemies) {
             enemy->draw(window);
         }
-        // spirit.Draw(window); // Uncomment when ready
+        spirit.draw(window); // Draw the spirit if active
         window.display();
     }
     return 0;
