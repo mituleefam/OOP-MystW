@@ -285,3 +285,13 @@ void Player::Draw()
 {
 
 }
+sf::FloatRect Player::getAttackBounds() const {
+	//     if (animState != AnimationState::Attacking)
+			 //return sf::FloatRect(); // No attack bounds if not attacking;
+			 // No need cause in main loop we check if the player is attacking before calling this function
+	float width = 10.f;
+	float height = 20.f;
+	sf::Vector2f pos = sprite.getPosition();
+	float offsetX = isFacingRight ? 15.f : -45.f; // 
+	return sf::FloatRect(pos.x + offsetX, pos.y - height, width, height);
+}

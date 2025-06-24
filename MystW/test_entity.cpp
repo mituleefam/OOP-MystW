@@ -80,7 +80,7 @@ int main()
             }
             else {
                 // Player attacks enemy
-                if (player.playerIsAttacking() && !player.attackRegistered && !currentEnemy->checkIsHurting() && player.getAttackBounds().intersects(currentEnemy->getBounds())) {
+                if (player.isAttacking && !player.attackRegistered && !currentEnemy->checkIsHurting() && player.getAttackBounds().intersects(currentEnemy->getBounds())) {
                     currentEnemy->takeDamage(1); // Example damage amount
                     player.attackRegistered = true;
                     std::cout << "Player attacked enemy!" << std::endl;
