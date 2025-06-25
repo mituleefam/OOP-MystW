@@ -1,11 +1,8 @@
 #include <iostream>
 #include "Player.h"
 #include "Spirit.h"
-// #include "Enemy.h" // Remove old Enemy.h include if it was separate from base
 #include "Elf.h"    // Include Elf.h (which includes the new base Enemy.h)
-// Potentially: #include "Goblin.h", etc. in the future
-
-// ... (rest of your includes and using namespace std) ...
+#include "Striker.h"
 
 int main()
 {
@@ -37,12 +34,11 @@ int main()
     sf::Clock clock;
 
     std::vector<std::unique_ptr<Enemy>> enemies; // This remains the same! Polymorphism at work.
-    // Create an Elf instance
+
+	// Create enemies using polymorphism
     enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 2000.0f, 800.0f));
     enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 2200.0f, 800.0f));
-
-    // In the future, to add a Goblin (assuming Goblin class exists and inherits Enemy):
-    // enemies.emplace_back(std::make_unique<Goblin>("Assets/Enemy/Goblin/Textures", 1000.0f, 800.0f));
+	enemies.emplace_back(std::make_unique<Striker>("Assets/Enemy/Striker/Textures", -100.0f, 880.0f));
 
 
     while (window.isOpen())
@@ -80,7 +76,7 @@ int main()
             }
             else {
                 // Player attacks enemy
-                if (player.isAttacking && !player.attackRegistered && !currentEnemy->checkIsHurting() && player.getAttackBounds().intersects(currentEnemy->getBounds())) {
+                if (player.isAttacking && !player.attackRegistered && !currentEnemy->checkIsHurting() && player.getAttackBounds().intersects(currentEnemy->getHitBox())) {
                     currentEnemy->takeDamage(1); // Example damage amount
                     player.attackRegistered = true;
                     std::cout << "Player attacked enemy!" << std::endl;
@@ -97,6 +93,12 @@ int main()
                         std::cout << "Player hit by Elf arrow!" << std::endl;
                     }
                 }
+                if (Striker* striker = dynamic_cast<Striker*>(currentEnemy)) {
+                    if (striker->attackRegistered) {
+                        player.takeDamage(5);
+                        std::cout << "Player hit by Striker!" << std::endl;
+                    }
+				}
                 // Option 2: Add virtual checkProjectileCollisions to base Enemy (better for many enemy types)
                 // In Enemy.h: virtual bool checkProjectileCollisions(const sf::FloatRect& playerBounds) { return false; }
                 //             virtual void handleProjectileCollisions(const sf::FloatRect& playerBounds) {}

@@ -29,12 +29,13 @@ public:
     virtual void draw(sf::RenderWindow& window);
     virtual void animate(float deltaTime); // Animation logic might be common
 
+	virtual sf::FloatRect getHitBox() const;      // Gets a more precise hitbox depending on the enemy's sprite
+
     // Common methods
     void takeDamage(int damageAmount);
     bool isDead() const;
     sf::Vector2f getPosition() const;
     sf::FloatRect getBounds() const;      // Gets the global bounds of the sprite
-    sf::FloatRect getHitBox() const;      // Gets a more precise hitbox
     bool checkIsHurting() const;
 
 protected:

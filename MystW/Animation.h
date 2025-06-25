@@ -10,3 +10,13 @@ struct Animation {
     float frameDuration = 0.1f;
     bool loop = true;
 };
+
+struct AnimSheetInfo
+{
+    const char* filename;
+    int frameWidth;
+    int frameHeight;
+    int frameCount;
+    float frameDuration;
+    bool loop;
+};

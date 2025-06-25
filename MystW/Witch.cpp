@@ -1,11 +1,11 @@
-#include "Elf.h"
+#include "Witch.h"
 #include "Player.h"
 #include "Math.h" // For normalizeVector, assuming it's in Math.h
 #include <iostream> // For debugging
 //#include <filesystem> // For file operations if needed, though not directly used in this snippet (C++17 or later)
 
-// Define the static member for Elf animation info
-const std::map<EnemyState, AnimSheetInfo> Elf::elfAnimSheetInfos = {
+// Define the static member for Witch animation info
+const std::map<EnemyState, AnimSheetInfo> Witch::witchAnimSheetInfos = {
     { EnemyState::Idle,        { "Idle.png",   160, 100, 6, 0.15f, true  }},
     { EnemyState::Running,     { "Run.png",    160, 100, 8, 0.1f,  true  }}, // Faster run animation
     { EnemyState::Attacking,   { "Attack.png", 160, 100, 6, 0.15f, false }}, // Non-looping attack
@@ -13,11 +13,11 @@ const std::map<EnemyState, AnimSheetInfo> Elf::elfAnimSheetInfos = {
     { EnemyState::Dying,       { "Die.png",    160, 100, 7, 0.2f,  false }}
 };
 
-Elf::Elf(const std::string& assetBaseFolder, float startX, float startY)
+Witch::Witch(const std::string& assetBaseFolder, float startX, float startY)
     : Enemy(startX, startY, 20, 120.0f), // Base constructor: x, y, max health, speed
     baseAssetPath(assetBaseFolder),
-    shootInterval(1.0f), // Elf shoots every 0.8 second
-    attackRange(700.0f)  // Elf attacks if player is within 700px
+    shootInterval(1.0f), // Witch shoots every 0.8 second
+    attackRange(700.0f)  // Witch attacks if player is within 700px
 {
     hurtDuration = 0.6f; // Elves recover a bit faster from hurt animation
     loadSpecificAssets();
@@ -25,9 +25,9 @@ Elf::Elf(const std::string& assetBaseFolder, float startX, float startY)
     shootCooldownTimer.restart();
 }
 
-void Elf::loadSpecificAssets() {
-    // Load Elf-specific animations
-    for (const auto& pair : elfAnimSheetInfos) {
+void Witch::loadSpecificAssets() {
+    // Load Witch-specific animations
+    for (const auto& pair : witchAnimSheetInfos) {
         loadStateFrames(pair.first, pair.second);
     }
 
@@ -35,7 +35,7 @@ void Elf::loadSpecificAssets() {
     std::string arrowPath = baseAssetPath + "/Arrow.png";
     arrowTexture = std::make_shared<sf::Texture>();
     if (!arrowTexture->loadFromFile(arrowPath)) {
-        std::cerr << "Failed to load Elf arrow texture: " << arrowPath << std::endl;
+        std::cerr << "Failed to load Witch arrow texture: " << arrowPath << std::endl;
     }
     // Set initial sprite texture and rect from Idle state
     if (animations.count(EnemyState::Idle) && !animations[EnemyState::Idle].frames.empty()) {
@@ -44,11 +44,11 @@ void Elf::loadSpecificAssets() {
         adjustSpriteOriginAndScale(); // Call this after texture is set
     }
     else {
-        std::cerr << "Elf Idle animation not loaded, sprite texture not set." << std::endl;
+        std::cerr << "Witch Idle animation not loaded, sprite texture not set." << std::endl;
     }
 }
 
-void Elf::loadStateFrames(EnemyState state, const AnimSheetInfo& info) {
+void Witch::loadStateFrames(EnemyState state, const AnimSheetInfo& info) {
     Animation anim;
     anim.frameDuration = info.frameDuration;
     anim.loop = info.loop;
@@ -56,7 +56,7 @@ void Elf::loadStateFrames(EnemyState state, const AnimSheetInfo& info) {
     std::string sheetPath = baseAssetPath + "/" + info.filename;
     auto texture = std::make_shared<sf::Texture>();
     if (!texture->loadFromFile(sheetPath)) {
-        std::cerr << "Failed to load Elf sheet: " << sheetPath << std::endl;
+        std::cerr << "Failed to load Witch sheet: " << sheetPath << std::endl;
         return;
     }
     anim.sheet = texture;
@@ -67,8 +67,8 @@ void Elf::loadStateFrames(EnemyState state, const AnimSheetInfo& info) {
     animations[state] = anim;
 }
 
-void Elf::update(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
-    // Always update arrows, even if Elf is hurt or dying
+void Witch::update(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
+    // Always update arrows, even if Witch is hurt or dying
     for (auto& arrow : arrows) {
         arrow.update(deltaTime);
     }
@@ -83,7 +83,7 @@ void Elf::update(float deltaTime, const sf::Vector2f& playerPos, const sf::Float
     Enemy::update(deltaTime, playerPos, playerHitBox);
 }
 
-void Elf::updateAI(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
+void Witch::updateAI(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
     // Prevent attacking if player is dead (hitbox is zero)
     if (playerHitBox.width == 0.f && playerHitBox.height == 0.f) {
         setState(EnemyState::Idle);
@@ -129,8 +129,8 @@ void Elf::updateAI(float deltaTime, const sf::Vector2f& playerPos, const sf::Flo
 }
 
 
-void Elf::performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
-    // This is called when the Elf decides to attack (e.g., when state becomes Attacking)
+void Witch::performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
+    // This is called when the Witch decides to attack (e.g., when state becomes Attacking)
     if (shootCooldownTimer.getElapsedTime().asSeconds() >= shootInterval) {
         tryShootArrow(playerPos, playerHitBox);
         shootCooldownTimer.restart();
@@ -138,9 +138,9 @@ void Elf::performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect&
 }
 
 
-void Elf::tryShootArrow(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
+void Witch::tryShootArrow(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
     if (!arrowTexture || arrowTexture->getSize().x == 0) { // Check if texture is valid
-        std::cerr << "Elf: Arrow texture not loaded or invalid." << std::endl;
+        std::cerr << "Witch: Arrow texture not loaded or invalid." << std::endl;
         return;
     }
 
@@ -162,10 +162,10 @@ void Elf::tryShootArrow(const sf::Vector2f& playerPos, const sf::FloatRect& play
     // AnimatedProjectile expects a vector of textures, even if it's just one for a non-animated arrow
     std::vector<std::shared_ptr<sf::Texture>> arrowFramesVec = { arrowTexture };
     arrows.emplace_back(arrowFramesVec, arrowStartPos, arrowVelocity, 0.1f); // 0.1f is frame duration if arrow was animated
-    std::cout << "Elf fired an arrow!" << std::endl;
+    std::cout << "Witch fired an arrow!" << std::endl;
 }
 
-void Elf::updateArrows(float deltaTime, const sf::RenderWindow& window) {
+void Witch::updateArrows(float deltaTime, const sf::RenderWindow& window) {
     for (auto& arrow : arrows) {
         arrow.update(deltaTime);
     }
@@ -179,29 +179,17 @@ void Elf::updateArrows(float deltaTime, const sf::RenderWindow& window) {
         }), arrows.end());
 }
 
-void Elf::draw(sf::RenderWindow& window) {
-    // Call base class draw to draw the Elf's sprite
+void Witch::draw(sf::RenderWindow& window) {
+    // Call base class draw to draw the Witch's sprite
     Enemy::draw(window);
 
-    // Draw Elf's arrows
+    // Draw Witch's arrows
     for (const auto& arrow : arrows) {
         arrow.draw(window);
     }
 }
 
-sf::FloatRect Elf::getHitBox() const {
-    sf::FloatRect box = sprite.getGlobalBounds();
-    float shrinkHorizontal = 0.2f; // Make hitbox 20% of sprite width
-    float shrinkVertical = 0.2f;   // Make hitbox 20% of sprite height
-
-    box.left += box.width * (1.0f - shrinkHorizontal) / 2.0f;
-    box.width *= shrinkHorizontal;
-    box.top += box.height * 0.7f; // lower multiplicant if aim higher
-    box.height *= shrinkVertical;
-    return box;
-}
-
-bool Elf::checkArrowCollisions(const sf::FloatRect& playerBounds) {
+bool Witch::checkArrowCollisions(const sf::FloatRect& playerBounds) {
     for (const auto& arrow : arrows) {
         if (arrow.getHitBox().intersects(playerBounds)) {
             return true;
@@ -210,7 +198,7 @@ bool Elf::checkArrowCollisions(const sf::FloatRect& playerBounds) {
     return false;
 }
 
-void Elf::removeArrowsCollidingWith(const sf::FloatRect& playerBounds) {
+void Witch::removeArrowsCollidingWith(const sf::FloatRect& playerBounds) {
     arrows.erase(std::remove_if(arrows.begin(), arrows.end(),
         [&](const AnimatedProjectile& arrow) {
             return arrow.getHitBox().intersects(playerBounds);
