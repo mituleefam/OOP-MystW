@@ -7,8 +7,8 @@
 // Define the static member for Striker animation info
 const std::map<EnemyState, AnimSheetInfo> Striker::strikerAnimSheetInfos = {
     { EnemyState::Idle,        { "Idle.png",   96, 84, 7, 0.15f, true  }},
-    { EnemyState::Running,     { "Run.png",    96, 84, 8, 0.1f,  true  }}, // Faster run animation
-    { EnemyState::Attacking,   { "Attack.png", 96, 84, 6, 0.18f, false }}, // Non-looping attack
+    { EnemyState::Running,     { "Run.png",    96, 84, 8, 0.08f,  true  }}, // Faster run animation
+    { EnemyState::Attacking,   { "Attack.png", 96, 84, 11, 0.1f, false }}, // Non-looping attack
     { EnemyState::Hurt,        { "Hurt.png",   96, 84, 4, 0.15f, false }},
     { EnemyState::Dying,       { "Die.png",    96, 84, 12, 0.5f,  false }}
 };
@@ -16,10 +16,12 @@ const std::map<EnemyState, AnimSheetInfo> Striker::strikerAnimSheetInfos = {
 Striker::Striker(const std::string& assetBaseFolder, float startX, float startY)
     : Enemy(startX, startY, 20, 120.0f), // Base constructor: x, y, max health, speed
     baseAssetPath(assetBaseFolder),
-    attackInterval(1.0f), // Striker attacks every 0.8 second
-    attackRange(250.0f)  // Striker attacks if player is within 700px
+    attackInterval(0.8f), // Striker attacks every 0.8 second
+    attackRange(200.0f)  // Striker attacks if player is within 200px
 {
-    hurtDuration = 0.6f; // Elves recover a bit faster from hurt animation
+	speed = 300.0f; // Override speed for Striker
+
+    hurtDuration = 0.6f; // Strikers recover a bit faster from hurt animation
     loadSpecificAssets();
     setState(EnemyState::Idle); // Set initial state after loading assets
     attackCooldownTimer.restart();

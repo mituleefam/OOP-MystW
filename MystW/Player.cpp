@@ -171,7 +171,7 @@ void Player::Update(float deltaTime)
 	case AnimationState::Jumping: frameCount = 4; break;
 	case AnimationState::AirAttacking: frameCount = 7; actualFrameDuration = frameDuration * 0.3f; break;
 	case AnimationState::Attacking: frameCount = 11; actualFrameDuration = frameDuration * 0.3f; break;
-	case AnimationState::Hurting: frameCount = 3; actualFrameDuration = frameDuration * 0.5f; break;
+	case AnimationState::Hurting: frameCount = 3; actualFrameDuration = frameDuration * 0.4f; break;
 	}
 
 	animationTimer += deltaTime;

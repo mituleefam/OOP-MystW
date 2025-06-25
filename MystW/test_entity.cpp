@@ -36,8 +36,9 @@ int main()
     std::vector<std::unique_ptr<Enemy>> enemies; // This remains the same! Polymorphism at work.
 
 	// Create enemies using polymorphism
-    enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 2000.0f, 800.0f));
-    enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 2200.0f, 800.0f));
+	// Base folder, X, Y coordinates
+    //enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 2000.0f, 800.0f));
+    //enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 2200.0f, 800.0f));
 	enemies.emplace_back(std::make_unique<Striker>("Assets/Enemy/Striker/Textures", -100.0f, 880.0f));
 
 

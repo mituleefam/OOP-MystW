@@ -172,8 +172,8 @@ sf::FloatRect Enemy::getBounds() const {
 sf::FloatRect Enemy::getHitBox() const {
     // Generic hitbox calculation, can be overridden by derived classes if needed
     sf::FloatRect box = sprite.getGlobalBounds();
-    float shrinkHorizontal = 0.4f; // Make hitbox 40% of sprite width
-    float shrinkVertical = 0.4f;   // Make hitbox 40% of sprite height
+    float shrinkHorizontal = 0.6f; // Make hitbox 60% of sprite width
+    float shrinkVertical = 0.6f;   // Make hitbox 60% of sprite height
 
     box.left += box.width * (1.0f - shrinkHorizontal) / 2.0f;
     box.width *= shrinkHorizontal;
