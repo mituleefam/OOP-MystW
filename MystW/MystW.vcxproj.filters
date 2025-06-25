@@ -37,7 +37,8 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PauseScene.hpp">
-
+		<Filter>Header Files</Filter>
+	</ClInclude>
     <ClInclude Include="Elf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -54,7 +55,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SpiritBullet.h">
-
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -79,7 +79,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PauseScene.cpp">
-
+		<Filter>Source Files</Filter>
+	</ClCompile>
     <ClCompile Include="Elf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -99,7 +100,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SpiritBullet.cpp">
-
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
