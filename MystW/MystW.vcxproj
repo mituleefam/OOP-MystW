@@ -107,7 +107,10 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;SFML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)dependencies\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>Default</LanguageStandard>
+      
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +133,16 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  
   <ItemGroup>
+
+    <ClInclude Include="Background.hpp" />
+    <ClInclude Include="GameScene.hpp" />
+    <ClInclude Include="MenuScene.hpp" />
+    <ClInclude Include="PauseScene.hpp" />
+    <ClInclude Include="Scene.hpp" />
+    <ClInclude Include="SceneManager.hpp" />
+
     <ClInclude Include="AnimatedProjectile.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Elf.h" />
@@ -141,7 +153,14 @@
     <ClInclude Include="SpiritBullet.h" />
     <ClInclude Include="Striker.h" />
   </ItemGroup>
+  
   <ItemGroup>
+    <ClCompile Include="Background.cpp" />
+    <ClCompile Include="MenuScene.cpp" />
+    <ClCompile Include="PauseScene.cpp" />
+    <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
+    
     <ClCompile Include="AnimatedProjectile.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Elf.cpp" />
@@ -153,6 +172,7 @@
     <ClCompile Include="Striker.cpp" />
     <ClCompile Include="test_entity.cpp" />
   </ItemGroup>
+  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

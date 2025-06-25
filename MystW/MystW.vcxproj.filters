@@ -21,6 +21,23 @@
     <ClInclude Include="Enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Background.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuScene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PauseScene.hpp">
+
     <ClInclude Include="Elf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -37,6 +54,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SpiritBullet.h">
+
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,6 +65,21 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+
+    <ClCompile Include="GameScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Background.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PauseScene.cpp">
+
     <ClCompile Include="Elf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,6 +99,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SpiritBullet.cpp">
+
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
