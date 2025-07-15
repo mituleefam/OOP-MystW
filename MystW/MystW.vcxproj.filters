@@ -72,6 +72,24 @@
     <ClInclude Include="..\..\Game\Game\Button.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Button.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuScene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PauseScene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Player.cpp">
@@ -131,5 +149,75 @@
     <ClCompile Include="..\..\Game\Game\test_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PauseScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="scores.txt" />
+    <Text Include="Assets\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="image\Menu\backgroundMenu.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\volumeOn_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\volumeOff_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\trophy_icon2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\trophy_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\sound_icon2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\sound_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\resume_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\pause_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\home_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame\background_2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame\background_1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame\background_0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="font\Roboto.ttf" />
+    <Font Include="font\PressStart2P-Regular.ttf" />
+    <Font Include="font\Merriweather-VariableFont_opsz,wdth,wght.ttf" />
+    <Font Include="font\ManufacturingConsent-Regular.ttf" />
+    <Font Include="font\cursive.ttf" />
   </ItemGroup>
 </Project>
