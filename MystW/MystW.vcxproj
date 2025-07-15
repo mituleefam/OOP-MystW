@@ -155,11 +155,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\Game\Game\Background.cpp" />
     <ClCompile Include="..\..\Game\Game\Button.cpp" />
-    <ClCompile Include="..\..\Game\Game\test_UI.cpp" />
     <ClCompile Include="..\..\Game\Game\MenuState.cpp" />
     <ClCompile Include="..\..\Game\Game\PausePage.cpp" />
     <ClCompile Include="..\..\Game\Game\ScoreManager.cpp" />
     <ClCompile Include="..\..\Game\Game\SoundPage.cpp" />
+    <ClCompile Include="..\..\Game\Game\test_UI.cpp" />
     <ClCompile Include="..\..\Game\Game\TrophyPage.cpp" />
     <ClCompile Include="ParallaxBackground.cpp" />
     <ClCompile Include="AnimatedProjectile.cpp" />

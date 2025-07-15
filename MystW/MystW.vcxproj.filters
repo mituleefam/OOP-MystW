@@ -125,10 +125,10 @@
     <ClCompile Include="..\..\Game\Game\TrophyPage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Game\Game\test_UI.cpp">
+    <ClCompile Include="..\..\Game\Game\Button.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Game\Game\Button.cpp">
+    <ClCompile Include="..\..\Game\Game\test_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
