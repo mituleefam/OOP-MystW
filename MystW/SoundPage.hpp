@@ -28,4 +28,3 @@ public:
 	void update(float delta) override;
 	void render(sf::RenderWindow& window) override;
 };
-

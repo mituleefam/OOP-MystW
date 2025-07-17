@@ -1,5 +1,6 @@
 #include "TrophyPage.hpp"
 #include "ScoreManager.hpp"
+
 TrophyPage::TrophyPage(StateManager* sm, sf::RenderWindow* window) : states(sm), win(window)
 {
 	float scaleX = 1920.0f / 800.0f;

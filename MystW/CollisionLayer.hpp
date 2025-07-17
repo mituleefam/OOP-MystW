@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
@@ -24,4 +24,3 @@ private:
     unsigned int m_width;           // Chiều rộng của map (số lượng tile)
     unsigned int m_height;          // Chiều cao của map (số lượng tile)
 };
-

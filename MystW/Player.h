@@ -1,6 +1,7 @@
 #pragma once
 #include "Enemy.h"
 #include <SFML/Graphics.hpp>
+#include "CollisionLayer.hpp" // ADDED: Forward-declare or include
 
 class Player
 {
@@ -14,7 +15,8 @@ private:
     const float moveSpeed = 600.0f; // Speed of horizontal movement
     const float gravity = 1600.0f;
 	const float fastFallGravity = 3000.0f; // Gravity when fast falling
-    const float groundY = 700.0f; // Same as the initial position of the player sprite
+	// MODIFIED: No longer need a fixed groundY
+    // const float groundY = 700.0f; // Same as the initial position of the player sprite
 
     float attackCooldown = 0.0f; // Cooldown for attacks
     const float attackCooldownDuration = 1.1f; // 1.1 second cooldown for attacks
@@ -55,8 +57,11 @@ public:
     Player() : velocity(0.0f, 0.0f) {};
     void Initialize(); // called once per game
     void Load(); // called once per level
-    void Update(float deltaTime); // called every frame
-    void Draw(); // called every frame after Update
+    // MODIFIED: Update now takes the collision layer as a parameter
+    void Update(float deltaTime, CollisionLayer& collisionLayer); // called every frame
+    //void Draw(); // called every frame after Update
+    // MODIFIED: Draw now takes the render window
+    void Draw(sf::RenderWindow& window);
 
     bool isJumping = false;
     bool isAttacking = false;

@@ -42,15 +42,17 @@ bool CollisionLayer::isCollidable(int x, int y) {
     // Chuyển đổi tọa độ pixel sang tọa độ tile
     int tileX = x / m_tileSize;
     int tileY = y / m_tileSize;
-
+    
     // Kiểm tra xem tọa độ có nằm trong bản đồ không
     if (tileX < 0 || tileX >= m_width || tileY < 0 || tileY >= m_height) {
         return true; // Coi như ngoài bản đồ là vật cản
     }
 
+    std::cout << "Checking collision at (" << tileX << ", " << tileY << ") = " << m_collisionData[tileY][tileX] << std::endl;
+
     // Kiểm tra giá trị trong mảng dữ liệu collision
-    // Giả sử '1' là vật cản
-    return m_collisionData[tileY][tileX] == 1;
+	// Giả sử '1' là vật cản (file .csv của Hoàng thì khác -1 là vật cản)
+    return m_collisionData[tileY][tileX] != -1;
 }
 
 unsigned int CollisionLayer::getTileSize() const {

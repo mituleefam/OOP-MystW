@@ -2,6 +2,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iostream>
+
 const std::string ScoreManager::fileName = "scores.txt";
 std::vector<int> ScoreManager::scores;
 void ScoreManager::loadScore()

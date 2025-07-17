@@ -2,30 +2,43 @@
 #include <filesystem>
 #include <iostream>
 
-BackgroundLayer::BackgroundLayer(const sf::Texture& texture, float scrollSpeed) {
-    sprite1.setTexture(texture);
-    sprite2.setTexture(texture);
-    sprite3.setTexture(texture);
-    sprite2.setPosition(static_cast<float>(texture.getSize().x), 0.0f);
-    sprite3.setPosition(static_cast<float>(texture.getSize().x) * 2.0f, 0.0f);
-    speed = scrollSpeed;
-}
+BackgroundLayer::BackgroundLayer(float speed) : scrollSpeed(speed) {}
 
-void BackgroundLayer::update() {
-    sprite1.move(-speed, 0.0f);
-    sprite2.move(-speed, 0.0f);
-    sprite3.move(-speed, 0.0f);
+void BackgroundLayer::updateMoveRight(float delta) {
+    //Scrolling
+    sprite1.move(-scrollSpeed * delta, 0.0f);
+    sprite2.move(-scrollSpeed * delta, 0.0f);
+    sprite3.move(-scrollSpeed * delta, 0.0f);
 
-    float width = static_cast<float>(sprite1.getTexture()->getSize().x);
-    float totalWidth = width * 3.0f; // Total width of 3 sprites
+    float width = sprite1.getGlobalBounds().width;
+    float totalWidth = width * 3.0f;
 
-
+    // Move forward a distance equal to the half of total width when background go out the screen
     if (sprite1.getPosition().x <= -width)
-        sprite1.move(totalWidth, 0.0f); // Move forward a distance equal to the total width
+        sprite1.move(totalWidth, 0.0f);
     if (sprite2.getPosition().x <= -width)
         sprite2.move(totalWidth, 0.0f);
     if (sprite3.getPosition().x <= -width)
         sprite3.move(totalWidth, 0.0f);
+}
+
+void BackgroundLayer::updateMoveLeft(float delta) {
+    //Scrolling
+    sprite1.move(scrollSpeed * delta, 0.0f);
+    sprite2.move(scrollSpeed * delta, 0.0f);
+    sprite3.move(scrollSpeed * delta, 0.0f);
+
+    float width = sprite1.getGlobalBounds().width;
+    float totalWidth = width * 3.0f;
+
+    // Move forward a distance equal to the half of total width when background go out the screen
+    if (sprite1.getPosition().x >= width)
+        sprite1.move(-totalWidth, 0.0f);
+    if (sprite2.getPosition().x >= width)
+        sprite2.move(-totalWidth, 0.0f);
+    if (sprite3.getPosition().x >= width)
+        sprite3.move(-totalWidth, 0.0f);
+
 }
 
 void BackgroundLayer::draw(sf::RenderWindow& window) {
@@ -34,31 +47,75 @@ void BackgroundLayer::draw(sf::RenderWindow& window) {
     window.draw(sprite3);
 }
 
-bool BackgroundManager::loadStage(const std::string& folderPath, const std::vector<float>& speeds) {
-    textures.clear();
-    layers.clear();
+void BackgroundLayer::load(const std::string& path, sf::RenderWindow& window)
+{
+    if (texture.loadFromFile(path))
+    {
+        sf::Vector2f windowSize = window.getView().getSize();
+        sf::Vector2u textureSize = texture.getSize();
+        float scaleX = windowSize.x / static_cast<float>(textureSize.x);
+        float scaleY = windowSize.y / static_cast<float>(textureSize.y);
+        std::cout << "Loaded: " << path << std::endl;
 
-    int i = 0;
-    for (const auto& entry : std::filesystem::directory_iterator(folderPath)) {
-        sf::Texture tex;
-        if (!tex.loadFromFile(entry.path().string())) {
-            std::cout << "Failed to load " << entry.path() << '\n';
-            return false;
-        }
-        textures.push_back(tex);
-        if (i < speeds.size())
-            layers.emplace_back(textures.back(), speeds[i]);
-        i++;
+        sprite1.setTexture(texture);
+        sprite2.setTexture(texture);
+        sprite3.setTexture(texture);
+
+        sprite1.setScale(scaleX, scaleY);
+        sprite2.setScale(scaleX, scaleY);
+        sprite3.setScale(scaleX, scaleY);
+
+        float scaleWidth = sprite1.getGlobalBounds().width;
+
+        sprite2.setPosition(scaleWidth, 0.0f);
+        sprite3.setPosition(scaleWidth * 2.0f, 0.0f);
+
     }
-    return true;
+    else
+        std::cout << "Cannot load file \n";
 }
 
-void BackgroundManager::update() {
+void ManageLayer::loadStage(const std::string& folderPath, sf::RenderWindow& window)
+{
+    layers.clear();
+    float baseSpeed = 50.0f;
+    int layerIndex = 0;
+    std::list<std::string> imagePath;
+
+    for (const auto& entry : std::filesystem::directory_iterator(folderPath))
+    {
+        if (!entry.is_regular_file())
+            continue;
+        std::string path = entry.path().string();
+        if (path.substr(path.size() - 4) == ".png" || path.substr(path.size() - 4) == ".jpg")
+        {
+            std::cout << "Take path successfully \n";
+            imagePath.push_back(path);
+        }
+    }
+    imagePath.sort();
+
+    for (const auto& path : imagePath)
+    {
+        layers.emplace_back(baseSpeed + (layerIndex * 20.0f));
+        layers.back().load(path, window);
+        layerIndex++;
+    }
+}
+
+void ManageLayer::update(float delta, char pressButton)
+{
     for (auto& layer : layers)
-        layer.update();
+    {
+        if (pressButton == 'A')
+            layer.updateMoveLeft(delta);
+        else if (pressButton == 'D')
+            layer.updateMoveRight(delta);
+    }
 }
 
-void BackgroundManager::draw(sf::RenderWindow& window) {
+void ManageLayer::draw(sf::RenderWindow& window)
+{
     for (auto& layer : layers)
         layer.draw(window);
 }

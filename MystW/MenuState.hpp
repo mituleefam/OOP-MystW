@@ -15,8 +15,8 @@ private:
 	StateManager* states;
 	sf::RenderWindow* win;
 public:
-	MenuState(StateManager* sm, sf::RenderWindow * window );
+	MenuState(StateManager* sm, sf::RenderWindow* window);
 	void handleEvent(sf::Event& event) override;
 	void update(float delta) override;
-	void render(sf::RenderWindow &window) override;
+	void render(sf::RenderWindow& window) override;
 };

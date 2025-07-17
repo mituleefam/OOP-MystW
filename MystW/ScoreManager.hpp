@@ -6,7 +6,7 @@ class ScoreManager
 {
 private:
 	static std::vector<int> scores;
-	static const std::string fileName ;
+	static const std::string fileName;
 	ScoreManager();
 public:
 	static void loadScore();

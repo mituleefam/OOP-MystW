@@ -2,8 +2,8 @@
 #include "GameState.hpp"
 #include "TrophyPage.hpp"
 #include "SoundPage.hpp"
-#include "TrophyPage.hpp"
 #include <iostream>
+
 MenuState::MenuState(StateManager* sm, sf::RenderWindow* window): states(sm), win(window){
 	if (!trophyTex.loadFromFile("image/icon/trophy_icon.png"))
 		std::cout << "Cannot load trophy icon \n";

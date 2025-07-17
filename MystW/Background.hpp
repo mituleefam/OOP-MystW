@@ -25,4 +25,3 @@ public:
     void update(float delta, char pressButton);
     void draw(sf::RenderWindow& window);
 };
-
