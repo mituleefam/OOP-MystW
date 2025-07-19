@@ -1,4 +1,4 @@
-#include "Player.h"
+﻿#include "Player.h"
 #include <iostream>
 #include "CollisionLayer.hpp" // Include to use collision logic
 
@@ -61,7 +61,7 @@ void Player::Load()
 		sprite.setTexture(textureSheet); // Set the texture to the sprite
 		sprite.setOrigin(25.0f, 18.5f); // Set the origin to the center of the sprite
 		sprite.setScale(5.0f, 5.0f); // Scale the sprite to 5x its original size
-		sprite.setPosition(400.0f, 900.0f); // Set the initial position of the player sprite
+		sprite.setPosition(400.0f, 1040.0f); // Set the initial position of the player sprite
 	}
 	else
 	{
@@ -72,227 +72,190 @@ void Player::Load()
 
 void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
 {
-	if (hurtCooldown > 0.0f) {
-		hurtCooldown -= deltaTime;
-		if (hurtCooldown < 0.0f) hurtCooldown = 0.0f;
-	}
-	if (attackCooldown > 0.0f) {
-		attackCooldown -= deltaTime;
-		if (attackCooldown < 0.0f) attackCooldown = 0.0f; // Prevent negative cooldown
-	}
+    if (hurtCooldown > 0.0f) {
+        hurtCooldown -= deltaTime;
+        if (hurtCooldown < 0.0f) hurtCooldown = 0.0f;
+    }
+    if (attackCooldown > 0.0f) {
+        attackCooldown -= deltaTime;
+        if (attackCooldown < 0.0f) attackCooldown = 0.0f;
+    }
 
-	// Track previous state to reset frame only on state change
-	static AnimationState prevAnimState = animState;
+    static AnimationState prevAnimState = animState;
 
-	// Die animation handling
-	if (animState == AnimationState::Die) {
-		//int dieFrameCount = 6;
-		int dieFrameCount = sizeof(dieFrames) / sizeof(dieFrames[0]); // More robust frame count
-		float dieFrameDuration = frameDuration * 1.5f;
-		animationTimer += deltaTime;
-		if (currentFrame < dieFrameCount) {
-			if (animationTimer >= dieFrameDuration) {
-				animationTimer = 0.0f;
-				currentFrame++;
-			}
-			if (currentFrame < dieFrameCount)
-				sprite.setTextureRect(dieFrames[currentFrame]);
-			else if (dieFrameCount > 0) {
-				// Reset to the last frame if animation is still playing
-				sprite.setTextureRect(dieFrames[dieFrameCount - 1]);
-			}
-		}
-		velocity.x = 0.f; // Stop horizontal movement
-		return;
-	}
+    if (animState == AnimationState::Die) {
+        int dieFrameCount = sizeof(dieFrames) / sizeof(dieFrames[0]);
+        float dieFrameDuration = frameDuration * 1.5f;
+        animationTimer += deltaTime;
 
-	// 
-	if (isAttacked && animState != AnimationState::Hurting) {
-		isAttacking = false;
-		animState = AnimationState::Hurting;
-		currentFrame = 0;
-		animationTimer = 0.0f;
-		hurtCooldown = hurtCooldownDuration;
-		std::cout << "Player is attacked!" << std::endl;
-	}
+        if (currentFrame < dieFrameCount) {
+            if (animationTimer >= dieFrameDuration) {
+                animationTimer = 0.0f;
+                currentFrame++;
+            }
+            if (currentFrame < dieFrameCount)
+                sprite.setTextureRect(dieFrames[currentFrame]);
+            else if (dieFrameCount > 0) {
+                sprite.setTextureRect(dieFrames[dieFrameCount - 1]);
+            }
+        }
+        velocity.x = 0.f;
+        return;
+    }
 
-	// --- INPUT HANDLING ---
-	//bool onGround = false; // We will determine this with collision checks later
-	velocity.x = 0.0f; // Reset horizontal velocity each frame
+    if (isAttacked && animState != AnimationState::Hurting) {
+        isAttacking = false;
+        animState = AnimationState::Hurting;
+        currentFrame = 0;
+        animationTimer = 0.0f;
+        hurtCooldown = hurtCooldownDuration;
+        std::cout << "Player is attacked!" << std::endl;
+    }
 
-	// Only allow movement if not in a state that locks movement (like Hurting)
-	if (animState != AnimationState::Hurting && !isAttacking) {
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-			velocity.x += moveSpeed;
-			isFacingRight = true;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-			velocity.x -= moveSpeed;
-			isFacingRight = false;
-		}
-	}
+    velocity.x = 0.0f;
 
-	// --- PHYSICS & COLLISION (The new core logic) ---
+    if (animState != AnimationState::Hurting && !isAttacking) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            velocity.x += moveSpeed;
+            isFacingRight = true;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+            velocity.x -= moveSpeed;
+            isFacingRight = false;
+        }
+    }
 
-	// 1. HORIZONTAL MOVEMENT & COLLISION
-	sprite.move(velocity.x * deltaTime, 0);
-	sf::FloatRect playerBounds = getHitBox();
-	int tileSize = collisionLayer.getTileSize();
+    int tileSize = collisionLayer.getTileSize();
+    sf::FloatRect playerBounds = getHitBox();
 
-	for (int y = playerBounds.top; y < playerBounds.top + playerBounds.height; y += tileSize / 4) {
-		if (velocity.x > 0) { // Moving right
-			if (collisionLayer.isCollidable(playerBounds.left + playerBounds.width, y)) {
-				sprite.setPosition((int)(playerBounds.left + playerBounds.width) / tileSize * tileSize - playerBounds.width, sprite.getPosition().y);
-				velocity.x = 0;
-				break;
-			}
-		}
-		else if (velocity.x < 0) { // Moving left
-			if (collisionLayer.isCollidable(playerBounds.left, y)) {
-				sprite.setPosition((int)playerBounds.left / tileSize * tileSize + tileSize, sprite.getPosition().y);
-				velocity.x = 0;
-				break;
-			}
-		}
-	}
+    sprite.move(velocity.x * deltaTime, 0);
+    playerBounds = getHitBox();
 
-	// 2. VERTICAL MOVEMENT & COLLISION (GRAVITY)
-	float currentGravity = (animState == AnimationState::AirAttacking) ? fastFallGravity : gravity;
-	velocity.y += currentGravity * deltaTime;
+    for (int y = playerBounds.top; y < playerBounds.top + playerBounds.height; y += tileSize / 4) {
+        if (velocity.x > 0 && collisionLayer.isCollidable(playerBounds.left + playerBounds.width, y)) {
+            float snapX = ((int)((playerBounds.left + playerBounds.width) / tileSize)) * tileSize - playerBounds.width;
+            sprite.setPosition(snapX, sprite.getPosition().y);
+            velocity.x = 0.f;
+            break;
+        }
+        else if (velocity.x < 0 && collisionLayer.isCollidable(playerBounds.left, y)) {
+            float snapX = ((int)(playerBounds.left / tileSize) + 1) * tileSize;
+            sprite.setPosition(snapX, sprite.getPosition().y);
+            velocity.x = 0.f;
+            break;
+        }
+    }
 
-	bool onGround = false; // Reset onGround each frame
-	sprite.move(0, velocity.y * deltaTime);
-	playerBounds = getHitBox(); // Get updated bounds after moving
+    float currentGravity = (animState == AnimationState::AirAttacking) ? fastFallGravity : gravity;
+    velocity.y += currentGravity * deltaTime;
 
-	for (int x = playerBounds.left; x < playerBounds.left + playerBounds.width; x += tileSize / 4) {
-		if (velocity.y > 0) { // Moving down
-			if (collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height)) {
-				sprite.setPosition(sprite.getPosition().x, (int)(playerBounds.top + playerBounds.height) / tileSize * tileSize - playerBounds.height);
-				velocity.y = 0;
-				onGround = true; // Landed on the ground (only here we set onGround true)
-				isJumping = false;
-				break;
-			}
-		}
-		else if (velocity.y < 0) { // Moving up
-			if (collisionLayer.isCollidable(x, playerBounds.top)) {
-				sprite.setPosition(sprite.getPosition().x, (int)playerBounds.top / tileSize * tileSize + tileSize);
-				velocity.y = 0; // Bonked head on ceiling
-				break;
-			}
-		}
-	}
+    sprite.move(0, velocity.y * deltaTime);
+    playerBounds = getHitBox();
 
-	// A final check to see if we are standing on something
-	// This helps if the player walks off a ledge
-	if (!onGround) {
-		//isJumping = true;
-		bool isSupported = false;
-		for (int x = playerBounds.left; x < playerBounds.left + playerBounds.width; x += tileSize / 4) {
-			if (collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height + 1)) {
-				isSupported = true;
-				break;
-			}
-		}
-		onGround = isSupported;
-		if (!onGround) {
-			isJumping = true; // If not on ground, we must be in the air
-		}
-	}
+    bool onGround = false;
 
+    for (int x = playerBounds.left; x < playerBounds.left + playerBounds.width; x += tileSize / 4) {
+        if (velocity.y > 0 && collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height)) {
+            float offset = getHitBox().top - sprite.getPosition().y;
+            float newY = std::floor((getHitBox().top + getHitBox().height) / tileSize) * tileSize - getHitBox().height - offset;
+            sprite.setPosition(sprite.getPosition().x, newY);
+            velocity.y = 0;
+            onGround = true;
+            isJumping = false;
+            break;
+        }
+        else if (velocity.y < 0 && collisionLayer.isCollidable(x, playerBounds.top)) {
+            int tileY = static_cast<int>(playerBounds.top / tileSize);
+            float snapY = (tileY + 1) * tileSize;
+            sprite.setPosition(sprite.getPosition().x, snapY);
+            velocity.y = 0.f;
+            break;
+        }
+    }
 
-	// --- JUMP & ATTACK INPUT (Based on new `onGround` state) ---
-	if (animState != AnimationState::Hurting) {
-		// Use Space to jump, a common convention. You can change it back to 'W'.
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && onGround) {
-			velocity.y = -jumpSpeed;
-			isJumping = true;
-			onGround = false;
-		}
+    if (!onGround) {
+        for (int x = playerBounds.left; x < playerBounds.left + playerBounds.width; x += tileSize / 4) {
+            if (collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height + 1)) {
+                onGround = true;
+                break;
+            }
+        }
+        isJumping = !onGround;
+    }
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::J) && attackCooldown <= 0.0f) {
-			isAttacking = true;
-			//currentFrame = 0;
-			//animationTimer = 0.0f;
-			attackCooldown = attackCooldownDuration;
-		}
-	}
+    if (animState != AnimationState::Hurting) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && onGround) {
+            velocity.y = -jumpSpeed;
+            isJumping = true;
+            onGround = false;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::J) && !isAttacking && attackCooldown <= 0.0f) {
+            isAttacking = true;
+            attackCooldown = attackCooldownDuration;
+            animState = onGround ? AnimationState::Attacking : AnimationState::AirAttacking;
+            currentFrame = 0;
+            animationTimer = 0.0f;
+        }
+    }
 
+    if (!isAttacking && animState != AnimationState::Hurting) {
+        if (isJumping)
+            animState = AnimationState::Jumping;
+        else if (velocity.x != 0)
+            animState = AnimationState::Running;
+        else
+            animState = AnimationState::Idle;
+    }
 
-	// --- ANIMATION STATE LOGIC (Old logic, slightly adapted) ---
-	if (animState != AnimationState::Hurting) { // Do not change state if hurting
-		if (isAttacking) {
-			animState = onGround ? AnimationState::Attacking : AnimationState::AirAttacking;
-		}
-		else if (isJumping) {
-			animState = AnimationState::Jumping;
-		}
-		else if (velocity.x != 0) {
-			animState = AnimationState::Running;
-		}
-		else {
-			animState = AnimationState::Idle;
-		}
-	}
+    if (animState != prevAnimState) {
+        currentFrame = 0;
+        prevAnimState = animState;
+    }
 
-	// ------ ANIMMATION ------
-	// Reset frame if state changed
-	if (animState != prevAnimState) {
-		currentFrame = 0;
-		prevAnimState = animState;
-	}
-	// Animation frame update
-	int frameCount = 1;
-	float actualFrameDuration = frameDuration;
-	switch (animState) {
-	case AnimationState::Idle: frameCount = 4; break;
-	case AnimationState::Running: frameCount = 6; break;
-	case AnimationState::Jumping: frameCount = 4; break;
-	case AnimationState::AirAttacking: frameCount = 7; actualFrameDuration = frameDuration * 0.3f; break;
-	case AnimationState::Attacking: frameCount = 11; actualFrameDuration = frameDuration * 0.3f; break;
-	case AnimationState::Hurting: frameCount = 3; actualFrameDuration = frameDuration * 0.4f; break;
-	}
+    int frameCount = 1;
+    float actualFrameDuration = frameDuration;
+    switch (animState) {
+    case AnimationState::Idle: frameCount = 4; break;
+    case AnimationState::Running: frameCount = 6; break;
+    case AnimationState::Jumping: frameCount = 4; break;
+    case AnimationState::AirAttacking: frameCount = 7; actualFrameDuration = frameDuration * 0.3f; break;
+    case AnimationState::Attacking: frameCount = 11; actualFrameDuration = frameDuration * 0.3f; break;
+    case AnimationState::Hurting: frameCount = 3; actualFrameDuration = frameDuration * 0.4f; break;
+    }
 
-	animationTimer += deltaTime;
-	if (animationTimer >= actualFrameDuration) {
-		animationTimer = 0.0f;
-		currentFrame++;
-		if (currentFrame >= frameCount) {
-			currentFrame = 0;
-			if (animState == AnimationState::Attacking || animState == AnimationState::AirAttacking) {
-				isAttacking = false;
-				//attackRegistered = false;
-				//animState = isJumping ? AnimationState::Jumping : AnimationState::Idle;
-			}
-			//if (animState == AnimationState::Attacking) {
-			//	isAttacking = false;
-			//	attackRegistered = false; // Reset for next attack
-			//	animState = AnimationState::Idle;
-			//}
-			if (animState == AnimationState::Hurting) {
-				isAttacked = false;
-				//animState = AnimationState::Idle;
-			}
-		}
-	}
+    animationTimer += deltaTime;
+    if (animationTimer >= actualFrameDuration) {
+        animationTimer = 0.0f;
+        currentFrame++;
 
-	// Set sprite texture rect (protect against out-of-bounds)
-	switch (animState) {
-	case AnimationState::Idle:			sprite.setTextureRect(idleFrames[currentFrame % 4]); break;
-	case AnimationState::Running:		sprite.setTextureRect(runningFrames[currentFrame % 6]); break;
-	case AnimationState::Jumping:		sprite.setTextureRect(jumpingFrames[currentFrame % 4]); break;
-	case AnimationState::AirAttacking:	sprite.setTextureRect(airAttackingFrames[currentFrame % 7]);	break;
-	case AnimationState::Attacking:		sprite.setTextureRect(swordAttackingFrames[currentFrame % 11]); break;
-	case AnimationState::Hurting:		sprite.setTextureRect(hurtingFrames[currentFrame % 3]); break;
-	default:							sprite.setTextureRect(idleFrames[0]); break;
-	}
+        std::cout << "State: " << static_cast<int>(animState) << ", Frame: " << currentFrame << ", isAttacking: " << isAttacking << "\n";
 
-	// ------ SET DIRECTION ------
-	// Set scale and origin based on facing direction
-	float originX = isFacingRight ? 20.0f : 30.0f;
-	sprite.setOrigin(originX, 18.5f);
-	sprite.setScale(isFacingRight ? 5.0f : -5.0f, 5.0f);
+        if (currentFrame >= frameCount) {
+            currentFrame = 0;
+            if (animState == AnimationState::Attacking || animState == AnimationState::AirAttacking) {
+                isAttacking = false;
+            }
+            if (animState == AnimationState::Hurting) {
+                isAttacked = false;
+            }
+        }
+    }
+
+    switch (animState) {
+    case AnimationState::Idle: sprite.setTextureRect(idleFrames[currentFrame % 4]); break;
+    case AnimationState::Running: sprite.setTextureRect(runningFrames[currentFrame % 6]); break;
+    case AnimationState::Jumping: sprite.setTextureRect(jumpingFrames[currentFrame % 4]); break;
+    case AnimationState::AirAttacking: sprite.setTextureRect(airAttackingFrames[currentFrame % 7]); break;
+    case AnimationState::Attacking: sprite.setTextureRect(swordAttackingFrames[currentFrame % 11]); break;
+    case AnimationState::Hurting: sprite.setTextureRect(hurtingFrames[currentFrame % 3]); break;
+    default: sprite.setTextureRect(idleFrames[0]); break;
+    }
+
+    float originX = isFacingRight ? 20.0f : 30.0f;
+    sprite.setOrigin(originX, 18.5f);
+    sprite.setScale(isFacingRight ? 5.0f : -5.0f, 5.0f);
 }
+
 void Player::takeDamage(int damage)
 {
 	if (hurtCooldown <= 0.0f) {
@@ -323,16 +286,24 @@ sf::FloatRect Player::getHitBox() const {
 	} // to stop the enemy from hitting the player when dead
 
 	sf::FloatRect box = sprite.getGlobalBounds();
-	float shrink = 0.7f; // Shrink hitbox by 70% ()
-	box.left += box.width * shrink / 2.0f;
-	box.top += box.height * shrink / 2.0f;
-	box.width *= (1.0f - shrink);
-	box.height *= (1.0f - shrink);
-	return box;
+    float shrinkX = 0.2f; // 20% chiều ngang
+    float shrinkY = 0.1f; // 10% chiều dọc
+    box.left += box.width * shrinkX / 2.0f;
+    box.top += box.height * shrinkY / 2.0f;
+    box.width *= (1.0f - shrinkX);
+    box.height *= (1.0f - shrinkY);
+
 }
 void Player::Draw(sf::RenderWindow& window)
 {
 	window.draw(sprite);
+	sf::FloatRect hitbox = getHitBox();
+	sf::RectangleShape box;
+	box.setPosition(hitbox.left, hitbox.top);
+	box.setSize(sf::Vector2f(hitbox.width, hitbox.height));
+	box.setFillColor(sf::Color(255, 0, 0, 100));
+	window.draw(box);
+
 }
 sf::FloatRect Player::getAttackBounds() const {
 	//     if (animState != AnimationState::Attacking)
