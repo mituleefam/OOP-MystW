@@ -4,7 +4,8 @@
 #include <iostream>
 Tileset::Tileset() : m_tileSize(0), m_width(0), m_height(0) {}
 
-bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, unsigned int tileSize) {
+bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, unsigned int tileSize, sf::Vector2f windowSize)
+{
     m_tileSize = tileSize;
 
     //Load tileset texture
@@ -40,16 +41,20 @@ bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, u
 
     //Map size
     m_height = m_mapData.size();
+    m_width = m_mapData[0].size(); // Số cột (tile theo ngang)
+
     const unsigned int maxVisibleX = 25;
     const unsigned int maxVisibleY = 19;
 
-    m_vertices.resize(maxVisibleX * maxVisibleY * 4);
+
 
     //Prepare vertices
     m_vertices.setPrimitiveType(sf::Quads);
     m_vertices.resize(m_width * m_height * 4);
 
-    int xOffset = 0, yOffset = 0;
+    int xOffset = 0;
+    int yOffset = m_height > maxVisibleY ? m_height - maxVisibleY : 0;
+
     bool found = false;
 
     for (unsigned int y = 0; y < m_height && !found; ++y) {
@@ -61,6 +66,8 @@ bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, u
             }
         }
     }
+    std::cout << "Offset: (" << xOffset << ", " << yOffset << ")\n";
+
     // Tính số tile hiển thị
     unsigned int visibleTileWidth = std::min(xOffset + maxVisibleX, m_width) - xOffset;
     unsigned int visibleTileHeight = std::min(yOffset + maxVisibleY, m_height) - yOffset;
@@ -69,9 +76,10 @@ bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, u
     float mapPixelWidth = visibleTileWidth * m_tileSize;
     float mapPixelHeight = visibleTileHeight * m_tileSize;
 
-    // Scale để vừa khớp trong khung 800x600
-    float scaleX = 800.0f / mapPixelWidth;
-    float scaleY = 600.0f / mapPixelHeight;
+    // Scale để vừa khớp trong khung 
+    float scaleX = windowSize.x / mapPixelWidth;
+    float scaleY = windowSize.y / mapPixelHeight;
+
 
     // Dùng scale nhỏ hơn để giữ đúng tỉ lệ (không bị méo)
     float finalScale = std::min(scaleX, scaleY);
@@ -86,6 +94,7 @@ bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, u
             int tv = tileNumber / (m_texture.getSize().x / m_tileSize);
 
             sf::Vertex* quad = &m_vertices[quadIndex * 4];
+
 
             quad[0].position = sf::Vector2f((x - xOffset) * m_tileSize * finalScale, (y - yOffset) * m_tileSize * finalScale);
             quad[1].position = sf::Vector2f((x - xOffset + 1) * m_tileSize * finalScale, (y - yOffset) * m_tileSize * finalScale);
@@ -107,18 +116,20 @@ bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, u
 
 
     // In thông tin tile đầu tiên được vẽ (để debug)
-    for (unsigned int y = 0; y < m_height; ++y) {
-        for (unsigned int x = 0; x < m_width; ++x) {
+    for (unsigned int y = yOffset; y < std::min(yOffset + maxVisibleY, m_height); ++y) {
+        for (unsigned int x = xOffset; x < std::min(xOffset + maxVisibleX, m_width); ++x) {
             int tileNumber = m_mapData[y][x];
             if (tileNumber < 0) continue;
-            sf::Vertex* quad = &m_vertices[(x + y * m_width) * 4];
+
             std::cout << "First valid tile at (" << x << "," << y << ") = " << tileNumber << "\n";
+            sf::Vertex* quad = &m_vertices[0]; // lấy cái đầu tiên (quadIndex == 0)
             for (int k = 0; k < 4; ++k)
                 std::cout << "(" << quad[k].position.x << "," << quad[k].position.y << ") ";
             std::cout << "\n";
             goto done;
         }
     }
+
 done:;
 
     return true;

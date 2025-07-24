@@ -1,5 +1,6 @@
 ﻿#include "GameState.hpp"
 #include "MenuState.hpp"
+#include "TileSets.h"
 #include "PausePage.hpp"
 #include <iostream>
 // ADDED: Include specific enemy types you want to create
@@ -23,11 +24,12 @@ GameState::GameState(StateManager* sm, sf::RenderWindow* window):win(window), st
 	const int tileWidth = 32;
 	const int tileHeight = 32;
 	const unsigned int TILE_SIZE = 32;
-
+	
 	// Load tileset for drawing
-	if (!tileSet.load("image/tile/tileset.png", "map.csv", TILE_SIZE)) {
+	if (!tileSet.load("image/tile/tileset.png", "map.csv", TILE_SIZE, window->getView().getSize())) {
 		std::cout << "Failed to load tileset!" << std::endl;
 	}
+	tileSet.load("image/tile/tileset.png", "map.csv", TILE_SIZE, window->getView().getSize());
 
 	// Load collision layer for physics
 	collisionLayer.load("Collision.csv", TILE_SIZE);
