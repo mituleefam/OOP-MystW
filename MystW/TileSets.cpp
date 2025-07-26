@@ -7,7 +7,7 @@ Tileset::Tileset() : m_tileSize(0), m_width(0), m_height(0) {}
 bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, unsigned int tileSize, sf::Vector2f windowSize)
 {
     m_tileSize = tileSize;
-
+    m_texture.setSmooth(false);
     //Load tileset texture
     if (!m_texture.loadFromFile(tilesetPath)) {
         std::cout << "Error: Cannot load file tileset: " << tilesetPath << std::endl;
@@ -80,13 +80,11 @@ bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, u
     float scaleX = windowSize.x / mapPixelWidth;
     float scaleY = windowSize.y / mapPixelHeight;
 
-
-    // Dùng scale nhỏ hơn để giữ đúng tỉ lệ (không bị méo)
-    float finalScale = std::min(scaleX, scaleY);
+   
     unsigned int quadIndex = 0;
 
-    for (unsigned int y = yOffset; y < std::min(yOffset + maxVisibleY, m_height); ++y) {
-        for (unsigned int x = xOffset; x < std::min(xOffset + maxVisibleX, m_width); ++x) {
+    for (unsigned int y = 0; y < m_height; ++y) {
+        for (unsigned int x = 0; x < m_width; ++x) {
             int tileNumber = m_mapData[y][x];
             if (tileNumber < 0) continue;
 
@@ -95,21 +93,23 @@ bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, u
 
             sf::Vertex* quad = &m_vertices[quadIndex * 4];
 
+            // Vẽ đúng vị trí trong thế giới
+            quad[0].position = sf::Vector2f(x * m_tileSize, y * m_tileSize);
+            quad[1].position = sf::Vector2f((x + 1) * m_tileSize, y * m_tileSize);
+            quad[2].position = sf::Vector2f((x + 1) * m_tileSize, (y + 1) * m_tileSize);
+            quad[3].position = sf::Vector2f(x * m_tileSize, (y + 1) * m_tileSize);
 
-            quad[0].position = sf::Vector2f((x - xOffset) * m_tileSize * finalScale, (y - yOffset) * m_tileSize * finalScale);
-            quad[1].position = sf::Vector2f((x - xOffset + 1) * m_tileSize * finalScale, (y - yOffset) * m_tileSize * finalScale);
-            quad[2].position = sf::Vector2f((x - xOffset + 1) * m_tileSize * finalScale, (y - yOffset + 1) * m_tileSize * finalScale);
-            quad[3].position = sf::Vector2f((x - xOffset) * m_tileSize * finalScale, (y - yOffset + 1) * m_tileSize * finalScale);
-
-
-            quad[0].texCoords = sf::Vector2f(tu * m_tileSize, tv * m_tileSize);
-            quad[1].texCoords = sf::Vector2f((tu + 1) * m_tileSize, tv * m_tileSize);
-            quad[2].texCoords = sf::Vector2f((tu + 1) * m_tileSize, (tv + 1) * m_tileSize);
-            quad[3].texCoords = sf::Vector2f(tu * m_tileSize, (tv + 1) * m_tileSize);
+            float texOffset = 0.01f;
+            quad[0].texCoords = sf::Vector2f(tu * m_tileSize + texOffset, tv * m_tileSize + texOffset);
+            quad[1].texCoords = sf::Vector2f((tu + 1) * m_tileSize - texOffset, tv * m_tileSize + texOffset);
+            quad[2].texCoords = sf::Vector2f((tu + 1) * m_tileSize - texOffset, (tv + 1) * m_tileSize - texOffset);
+            quad[3].texCoords = sf::Vector2f(tu * m_tileSize + texOffset, (tv + 1) * m_tileSize - texOffset);
 
             quadIndex++;
         }
     }
+    m_vertices.resize(quadIndex * 4);
+
 
     // Resize lại đúng với số lượng quad thực sự dùng
     m_vertices.resize(quadIndex * 4);

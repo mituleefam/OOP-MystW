@@ -45,7 +45,7 @@ bool CollisionLayer::isCollidable(int x, int y) {
     if (tileX < 0 || tileX >= m_width || tileY < 0 || tileY >= m_height)
         return true; // ngoài bản đồ = vật cản
 
-    return m_collisionData[tileY][tileX] == 192;
+    return m_collisionData[tileY][tileX] == 1;
 }
 
 
