@@ -136,6 +136,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Background.hpp" />
     <ClInclude Include="Button.hpp" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="CollisionLayer.hpp" />
     <ClInclude Include="Elf.h" />
     <ClInclude Include="Enemy.h" />
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CollisionLayer.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="MenuScene.cpp" />

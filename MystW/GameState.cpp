@@ -1,5 +1,6 @@
 ﻿#include "GameState.hpp"
 #include "MenuState.hpp"
+#include "Camera.h"
 #include "TileSets.h"
 #include "PausePage.hpp"
 #include <iostream>
@@ -7,40 +8,44 @@
 #include "Elf.h"
 #include "Striker.h"
 
-GameState::GameState(StateManager* sm, sf::RenderWindow* window):win(window), states(sm)
+GameState::GameState(StateManager* sm, sf::RenderWindow* window): win(window), states(sm)
 {
 	background.loadStage("image/backgroundGame", *win);
 	pauseTex.loadFromFile("image/icon/pause_icon.png");
-	sf::Vector2f viewSize = win->getView().getSize();
+
+	sf::Vector2f viewSize = window->getView().getSize();
 	float scaleX = viewSize.x / 800.f;
 	float scaleY = viewSize.y / 600.f;
 
 	pause.setIcon(pauseTex, 15.f * scaleX, 15.f * scaleY, 24.0f * scaleX);
 	pause.setShape(15.f * scaleX, 15.f * scaleY, 25.f * scaleX, 30.f * scaleY);
 
-
-	
-	//Hoang's part
-	const int tileWidth = 32;
-	const int tileHeight = 32;
 	const unsigned int TILE_SIZE = 32;
-	
-	// Load tileset for drawing
+
+	// Load tileset trước để lấy kích thước
 	if (!tileSet.load("image/tile/tileset.png", "map.csv", TILE_SIZE, window->getView().getSize())) {
 		std::cout << "Failed to load tileset!" << std::endl;
 	}
-	tileSet.load("image/tile/tileset.png", "map.csv", TILE_SIZE, window->getView().getSize());
 
-	// Load collision layer for physics
+	// Load collision
 	collisionLayer.load("Collision.csv", TILE_SIZE);
 
-	// --- ADDED: Initialize Player and Enemies ---
-	player.Initialize(); // Initialize player properties
-	player.Load();       // Load player assets
-	player.setPosition(200, 600); // Set a starting position
+	// Bây giờ mới lấy được kích thước map từ tileset
+	float mapWidth = tileSet.getMapWidth() * TILE_SIZE;
+	float mapHeight = tileSet.getMapHeight() * TILE_SIZE;
 
-	loadEnemies(); // Call the function to create enemies
+	camera = Camera(viewSize, sf::Vector2f(mapWidth, mapHeight)); // Gán lại sau khi có kích thước
+
+	// Player
+	player.Initialize();
+	player.Load();
+	player.setPosition(200, 600);
+
+	loadEnemies();
 }
+
+
+
 
 void GameState::handleEvent(sf::Event& event)
 {
@@ -76,7 +81,7 @@ void GameState::update(float delta)
 {
 	// --- Update Player ---
 	player.Update(delta, collisionLayer);
-
+	camera.follow(player.getPosition());
 	// --- Link Player Movement to Background Scrolling ---
 	// The background should scroll opposite to the player's movement
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || isAClicked)
@@ -130,7 +135,8 @@ void GameState::render(sf::RenderWindow& window)
 	// Draw order is important: background first, then map, then entities
 	background.draw(window);
 	window.draw(tileSet);
-
+	// ---ADDED: Camera Character ---
+	camera.applyTo(window);
 	// --- ADDED: Draw the player and enemies ---
 	player.Draw(window); // Assuming Player has a Draw method that draws its sprite on the window
 	for (const auto& enemy : enemies) {

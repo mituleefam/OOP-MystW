@@ -7,6 +7,8 @@ class Tileset : public sf::Drawable {
 public:
     Tileset();
     bool load(const std::string& tilesetPath, const std::string& mapPath, unsigned int tileSize, sf::Vector2f windowSize);
+    unsigned int getMapWidth() const { return m_width; }
+    unsigned int getMapHeight() const { return m_height; }
 private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
