@@ -49,16 +49,6 @@ GameState::GameState(StateManager* sm, sf::RenderWindow* window): win(window), s
 
 void GameState::handleEvent(sf::Event& event)
 {
-	/*
-	if (event.type == sf::Event::KeyPressed)
-	{
-		if (event.key.code == sf::Keyboard::A)
-			isAClicked = true;
-
-		if (event.key.code == sf::Keyboard::D)
-			isDClicked = true;
-	}
-	*/
 
 	// This function primarily handles events that happen once, like key presses
 	if (event.type == sf::Event::KeyPressed)
@@ -81,6 +71,11 @@ void GameState::update(float delta)
 {
 	// --- Update Player ---
 	player.Update(delta, collisionLayer);
+	sf::Vector2f pos = player.getPosition();
+	if (pos.x < 0.f) {
+		player.setPosition(0.f, pos.y); // hoặc player.setX(pos.x);
+	}
+
 	camera.follow(player.getPosition());
 	// --- Link Player Movement to Background Scrolling ---
 	// The background should scroll opposite to the player's movement

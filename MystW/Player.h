@@ -42,6 +42,7 @@ private:
     sf::IntRect dieFrames[6];
 
 	// Unused variables for future use
+	// Unused variables for future use
     const float knockbackForce = 1.0f; // Force applied when the player is attacked
 
 public:

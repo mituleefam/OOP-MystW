@@ -130,6 +130,15 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
 
     sprite.move(velocity.x * deltaTime, 0);
     playerBounds = getHitBox();
+    sf::FloatRect hb = getHitBox();
+    if (hb.left <= 0.f + tileSize / 2.f && velocity.x == 0.f && velocity.y == 0.f) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+
+            return;
+        }
+    }
+
+
 
     for (int y = playerBounds.top; y < playerBounds.top + playerBounds.height; y += tileSize / 4) {
         if (velocity.x > 0 && collisionLayer.isCollidable(playerBounds.left + playerBounds.width, y)) {
@@ -155,7 +164,8 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
     bool onGround = false;
 
     for (int x = playerBounds.left; x < playerBounds.left + playerBounds.width; x += tileSize / 4) {
-        if (velocity.y > 0 && collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height)) {
+        if (x >= 0 && velocity.y > 0 && collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height)) {
+            // Snap to ground
             float offset = getHitBox().top - sprite.getPosition().y;
             float newY = std::floor((getHitBox().top + getHitBox().height) / tileSize) * tileSize - getHitBox().height - offset;
             sprite.setPosition(sprite.getPosition().x, newY);
@@ -164,24 +174,19 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
             isJumping = false;
             break;
         }
-        else if (velocity.y < 0 && collisionLayer.isCollidable(x, playerBounds.top)) {
-            int tileY = static_cast<int>(playerBounds.top / tileSize);
-            float snapY = (tileY + 1) * tileSize;
-            sprite.setPosition(sprite.getPosition().x, snapY);
-            velocity.y = 0.f;
-            break;
-        }
     }
+
 
     if (!onGround) {
         for (int x = playerBounds.left; x < playerBounds.left + playerBounds.width; x += tileSize / 4) {
-            if (collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height + 1)) {
+            if (x >= 0 && collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height + 1)) {
                 onGround = true;
                 break;
             }
         }
         isJumping = !onGround;
     }
+
 
     if (animState != AnimationState::Hurting) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && onGround) {
@@ -292,7 +297,7 @@ sf::FloatRect Player::getHitBox() const {
     box.top += box.height * shrinkY / 2.0f;
     box.width *= (1.0f - shrinkX);
     box.height *= (1.0f - shrinkY);
-
+    return box;
 }
 void Player::Draw(sf::RenderWindow& window)
 {
