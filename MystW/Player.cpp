@@ -60,7 +60,7 @@ void Player::Load()
 		std::cout << "Player texture loaded successfully" << std::endl;
 		sprite.setTexture(textureSheet); // Set the texture to the sprite
 		sprite.setOrigin(25.0f, 18.5f); // Set the origin to the center of the sprite
-		sprite.setScale(5.0f, 5.0f); // Scale the sprite to 5x its original size
+		sprite.setScale(2.0f, 2.0f); // Scale the sprite to 5x its original size
 		sprite.setPosition(400.0f, 1040.0f); // Set the initial position of the player sprite
 	}
 	else
@@ -148,8 +148,10 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
             break;
         }
         else if (velocity.x < 0 && collisionLayer.isCollidable(playerBounds.left, y)) {
-            float snapX = ((int)(playerBounds.left / tileSize) + 1) * tileSize;
-            sprite.setPosition(snapX, sprite.getPosition().y);
+            float tileX = std::floor(playerBounds.left / tileSize);
+            float snapX = (tileX + 1) * tileSize;
+            float offset = playerBounds.left - sprite.getPosition().x;
+            sprite.setPosition(snapX - offset, sprite.getPosition().y);
             velocity.x = 0.f;
             break;
         }
@@ -174,7 +176,7 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
             isJumping = false;
             break;
         }
-    }
+    }   
 
 
     if (!onGround) {
@@ -233,7 +235,7 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
         animationTimer = 0.0f;
         currentFrame++;
 
-        std::cout << "State: " << static_cast<int>(animState) << ", Frame: " << currentFrame << ", isAttacking: " << isAttacking << "\n";
+        //std::cout << "State: " << static_cast<int>(animState) << ", Frame: " << currentFrame << ", isAttacking: " << isAttacking << "\n";
 
         if (currentFrame >= frameCount) {
             currentFrame = 0;
@@ -258,7 +260,7 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
 
     float originX = isFacingRight ? 20.0f : 30.0f;
     sprite.setOrigin(originX, 18.5f);
-    sprite.setScale(isFacingRight ? 5.0f : -5.0f, 5.0f);
+    sprite.setScale(isFacingRight ? 2.0f : -2.0f, 2.0f);
 }
 
 void Player::takeDamage(int damage)
