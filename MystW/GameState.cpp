@@ -23,12 +23,12 @@ GameState::GameState(StateManager* sm, sf::RenderWindow* window): win(window), s
 	const unsigned int TILE_SIZE = 32;
 
 	// Load tileset trước để lấy kích thước
-	if (!tileSet.load("image/tile/tileset.png", "map.csv", TILE_SIZE, window->getView().getSize())) {
+	if (!tileSet.load("image/tile/tileset.png", "map1.csv", TILE_SIZE, window->getView().getSize())) {
 		std::cout << "Failed to load tileset!" << std::endl;
 	}
 
 	// Load collision
-	collisionLayer.load("Collision.csv", TILE_SIZE);
+	collisionLayer.load("Collision1.csv", TILE_SIZE);
 
 	// Bây giờ mới lấy được kích thước map từ tileset
 	float mapWidth = tileSet.getMapWidth() * TILE_SIZE;
@@ -85,6 +85,9 @@ void GameState::update(float delta)
 	//	background.update(delta, 'A');
 	//if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || isDClicked)
 	//	background.update(delta, 'D');
+	// GỌI HÀM UPDATE MỚI CỦA BACKGROUND
+	// Truyền vào tâm của camera
+	background.update(camera.getView().getCenter());
 
 	for (auto it = enemies.begin(); it != enemies.end(); ) {
 		Enemy* currentEnemy = it->get(); // Get raw pointer for convenience
@@ -129,11 +132,12 @@ void GameState::update(float delta)
 
 void GameState::render(sf::RenderWindow& window)
 {
-	window.clear();
+	// window.clear();
+	window.setView(*states->getUiView()); // << ĐÂY LÀ BƯỚC QUAN TRỌNG NHẤT
+	background.draw(window);
 	// ---ADDED: Camera Character ---
 	camera.applyTo(window);
 	// Draw order is important: background first, then map, then entities
-	background.draw(window);
 	window.draw(tileSet);
 
 	// --- ADDED: Draw the player and enemies ---
@@ -143,7 +147,7 @@ void GameState::render(sf::RenderWindow& window)
 	}
 
 	// Draw UI on top of everything
-	window.setView(window.getDefaultView()); // << ĐÂY LÀ BƯỚC QUAN TRỌNG NHẤT
+	window.setView(*states->getUiView()); // << ĐÂY LÀ BƯỚC QUAN TRỌNG NHẤT
 	pause.render(window);
 	// Ví dụ sau này có thể vẽ thêm:
 	// scoreText.draw(window);
