@@ -1,8 +1,11 @@
 #include "TrophyPage.hpp"
 #include "ScoreManager.hpp"
 
-TrophyPage::TrophyPage(StateManager* sm, sf::RenderWindow* window) : states(sm), win(window)
+// TrophyPage::TrophyPage(StateManager* sm, sf::RenderWindow* window) : states(sm), win(window)
+TrophyPage::TrophyPage(StateManager* sm) : states(sm)
 {
+	win = states->getWindow();
+
 	float scaleX = 1920.0f / 800.0f;
 	float scaleY = 1080.0f / 600.0f;
 	trophyBox.setSize(sf::Vector2f(1000, 600));
@@ -62,6 +65,8 @@ void TrophyPage::update(float delta){}
 
 void TrophyPage::render(sf::RenderWindow& window)
 {
+	window.setView(*states->getUiView());
+
 	window.draw(trophyBox);
 	for (auto text : scoreText)
 		window.draw(text);

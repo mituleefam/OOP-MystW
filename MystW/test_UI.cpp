@@ -7,12 +7,16 @@
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1280, 720), "My Game", sf::Style::Default);
-    sf::View fixedView(sf::FloatRect(0, 0, 1920, 1080));
-    window.setView(fixedView);
+    //sf::View fixedView(sf::FloatRect(0, 0, 1920, 1080));
+    //window.setView(fixedView);
+    // Đổi tên fixedView thành uiView cho rõ nghĩa.
+    // Đây là view DÀNH RIÊNG cho tất cả các giao diện người dùng.
+    sf::View uiView(sf::FloatRect(0, 0, 1920, 1080));
     window.setFramerateLimit(60); // LIMIT FPS
 
-    StateManager manager;
-    manager.pushState(std::make_unique<MenuState>(&manager, &window));
+    StateManager manager(&window, &uiView); // Truyền uiView vào StateManager
+    // manager.pushState(std::make_unique<MenuState>(&manager, &window));
+    manager.pushState(std::make_unique<MenuState>(&manager));
 
     sf::Clock clock;
 
@@ -28,18 +32,20 @@ int main()
                 float windowRatio = static_cast<float>(event.size.width) / event.size.height;
                 float viewRatio = 1920.0f / 1080.0f;
 
-                sf::View view(sf::FloatRect(0, 0, 1920, 1080));
+                //sf::View view(sf::FloatRect(0, 0, 1920, 1080));
 
+                // KHÔNG TẠO VIEW MỚI.
+                // CHỈ CẬP NHẬT VIEWPORT TRÊN uiView HIỆN CÓ.
                 if (windowRatio > viewRatio) {
                     float width = viewRatio / windowRatio;
-                    view.setViewport(sf::FloatRect((1.0f - width) / 2.0f, 0.0f, width, 1.0f));
+                    uiView.setViewport(sf::FloatRect((1.0f - width) / 2.0f, 0.0f, width, 1.0f));
                 }
                 else {
                     float height = windowRatio / viewRatio;
-                    view.setViewport(sf::FloatRect(0.0f, (1.0f - height) / 2.0f, 1.0f, height));
+                    uiView.setViewport(sf::FloatRect(0.0f, (1.0f - height) / 2.0f, 1.0f, height));
                 }
-
-                window.setView(view);
+                // Dòng window.setView ở đây không còn cần thiết nữa vì ta sẽ set view trong từng state.
+                //window.setView(view);
             }
 
             if (manager.getCurrentState())
@@ -47,13 +53,17 @@ int main()
         }
 
         float deltaTime = clock.restart().asSeconds();
+        if (deltaTime > 0.1f) {
+            deltaTime = 0.1f;
+        }
 
         if (manager.getCurrentState())
             manager.update(deltaTime);
 
         window.clear();
         if (manager.getCurrentState())
-            manager.render(window);
+            // manager.render(window);
+            manager.render();
 
         window.display();
     }

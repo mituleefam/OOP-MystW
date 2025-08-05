@@ -4,7 +4,10 @@
 #include "SoundPage.hpp"
 #include <iostream>
 
-MenuState::MenuState(StateManager* sm, sf::RenderWindow* window): states(sm), win(window){
+//MenuState::MenuState(StateManager* sm, sf::RenderWindow* window): states(sm), win(window){
+MenuState::MenuState(StateManager *sm) : states(sm) {
+	win = states->getWindow();
+
 	if (!trophyTex.loadFromFile("image/icon/trophy_icon.png"))
 		std::cout << "Cannot load trophy icon \n";
 
@@ -58,13 +61,15 @@ void MenuState::handleEvent(sf::Event& event)
 	if (sound.isClicked(*win, event))
 	{
 		std::cout << "Sound button is clicked \n";
-		states->pushState(std::make_unique<SoundPage>(states, win));
+		// states->pushState(std::make_unique<SoundPage>(states, win));
+		states->pushState(std::make_unique<SoundPage>(states));
 	}
 
 	if (trophy.isClicked(*win, event))
 	{
 		std::cout << "Trophy button is clicked \n";
-		states->pushState(std::make_unique<TrophyPage>(states, win));
+		// states->pushState(std::make_unique<TrophyPage>(states, win));
+		states->pushState(std::make_unique<TrophyPage>(states));
 	}
 
 }
@@ -79,6 +84,8 @@ void MenuState::update(float delta)
 
 void MenuState::render(sf::RenderWindow& window)
 {
+	window.setView(*states->getUiView());
+
 	window.draw(menuBackground);
 	play.render(window);
 	exit.render(window);

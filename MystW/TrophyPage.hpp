@@ -16,7 +16,8 @@ private:
 	sf::Font font;
 
 public:
-	TrophyPage(StateManager* sm, sf::RenderWindow* window);
+	// TrophyPage(StateManager* sm, sf::RenderWindow* window);
+	TrophyPage(StateManager* sm);
 	void handleEvent(sf::Event& event) override;
 	void update(float delta) override;
 	void render(sf::RenderWindow& window) override;

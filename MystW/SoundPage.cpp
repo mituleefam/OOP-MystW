@@ -1,8 +1,11 @@
 #include "SoundPage.hpp"
 #include <iostream>
 
-SoundPage::SoundPage(StateManager* sm, sf::RenderWindow* window) : states(sm), win(window)
+//SoundPage::SoundPage(StateManager* sm, sf::RenderWindow* window) : states(sm), win(window)
+SoundPage::SoundPage(StateManager* sm) : states(sm)
 {
+	win = states->getWindow();
+
 	sf::Vector2f viewSize = win->getView().getSize();
 
 	auto scaleX = viewSize.x / 800.f;
@@ -82,6 +85,8 @@ void SoundPage::update(float delta) {
 
 void SoundPage::render(sf::RenderWindow& window)
 {
+	window.setView(*states->getUiView());
+
 	window.draw(soundBox);
 	window.draw(slideBar);
 	window.draw(track);

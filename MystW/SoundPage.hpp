@@ -23,7 +23,8 @@ private:
 	sf::Sprite volumeOn, volumeOff;
 
 public:
-	SoundPage(StateManager* sm, sf::RenderWindow* window);
+	// SoundPage(StateManager* sm, sf::RenderWindow* window);
+	SoundPage(StateManager* sm);
 	void handleEvent(sf::Event& event) override;
 	void update(float delta) override;
 	void render(sf::RenderWindow& window) override;

@@ -17,7 +17,8 @@ private:
 	bool isResumeClicked = false;
 	bool isHomeClicked = false;
 public:
-	PausePage(StateManager* sm, sf::RenderWindow* window);
+	//PausePage(StateManager* sm, sf::RenderWindow* window);
+	PausePage(StateManager* sm);
 	void handleEvent(sf::Event& event) override;
 	void update(float delta) override;
 	void render(sf::RenderWindow& window) override;

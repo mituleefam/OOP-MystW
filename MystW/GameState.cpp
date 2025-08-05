@@ -56,14 +56,16 @@ void GameState::handleEvent(sf::Event& event)
 		// Removed isAClicked and isDClicked, as we will handle continuous movement in update()
 		if (event.key.code == sf::Keyboard::Escape)
 		{
-			states->pushState(std::make_unique<PausePage>(states, win));
+			// states->pushState(std::make_unique<PausePage>(states, win));
+			states->pushState(std::make_unique<PausePage>(states));
 		}
 	}
 
 	if (pause.isClicked(*win, event) || event.key.code == sf::Keyboard::Escape)
 	{
 		std::cout << "Pause is clicked \n";
-		states->pushState(std::make_unique<PausePage>(states,win));
+		// states->pushState(std::make_unique<PausePage>(states,win));
+		states->pushState(std::make_unique<PausePage>(states));
 	}
 }
 
@@ -79,10 +81,10 @@ void GameState::update(float delta)
 	camera.follow(player.getPosition());
 	// --- Link Player Movement to Background Scrolling ---
 	// The background should scroll opposite to the player's movement
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || isAClicked)
-		background.update(delta, 'A');
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || isDClicked)
-		background.update(delta, 'D');
+	//if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || isAClicked)
+	//	background.update(delta, 'A');
+	//if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || isDClicked)
+	//	background.update(delta, 'D');
 
 	for (auto it = enemies.begin(); it != enemies.end(); ) {
 		Enemy* currentEnemy = it->get(); // Get raw pointer for convenience
@@ -127,11 +129,13 @@ void GameState::update(float delta)
 
 void GameState::render(sf::RenderWindow& window)
 {
+	window.clear();
+	// ---ADDED: Camera Character ---
+	camera.applyTo(window);
 	// Draw order is important: background first, then map, then entities
 	background.draw(window);
 	window.draw(tileSet);
-	// ---ADDED: Camera Character ---
-	camera.applyTo(window);
+
 	// --- ADDED: Draw the player and enemies ---
 	player.Draw(window); // Assuming Player has a Draw method that draws its sprite on the window
 	for (const auto& enemy : enemies) {
@@ -139,7 +143,11 @@ void GameState::render(sf::RenderWindow& window)
 	}
 
 	// Draw UI on top of everything
+	window.setView(window.getDefaultView()); // << ĐÂY LÀ BƯỚC QUAN TRỌNG NHẤT
 	pause.render(window);
+	// Ví dụ sau này có thể vẽ thêm:
+	// scoreText.draw(window);
+	// healthBar.draw(window);
 }
 
 // ADDED: Implementation for loading enemies

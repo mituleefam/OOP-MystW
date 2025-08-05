@@ -1,9 +1,13 @@
-#include "PausePage.hpp"
+﻿#include "PausePage.hpp"
 #include "MenuState.hpp"
 #include "GameState.hpp"
 
-PausePage::PausePage(StateManager* sm, sf::RenderWindow* window) : states(sm), win(window)
+//PausePage::PausePage(StateManager* sm, sf::RenderWindow* window) : states(sm), win(window)
+PausePage::PausePage(StateManager* sm) : states(sm)
 {
+	// Lấy window từ StateManager
+	win = states->getWindow();
+
 	resTex.loadFromFile("image/icon/resume_icon.png");
 	backTex.loadFromFile("image/icon/home_icon.png");
 	sf::Vector2f center(1920.f / 2.f, 1080.f / 2.f);
@@ -48,7 +52,8 @@ void PausePage::update(float delta)
 
 	if (isHomeClicked)
 	{
-		states->pushState(std::make_unique<MenuState>(states, win));
+		// states->pushState(std::make_unique<MenuState>(states, win));
+		states->pushState(std::make_unique<MenuState>(states));
 		isHomeClicked = false;
 		return;
 	}
@@ -56,8 +61,12 @@ void PausePage::update(float delta)
 
 void PausePage::render(sf::RenderWindow& window)
 {
-	win->draw(overlay);
-	win->draw(pauseBox);
-	resume.render(*win);
-	back.render(*win);
+	// LUÔN LUÔN set view cho các state là UI thuần túy
+	window.setView(*states->getUiView());
+
+	// Giờ mới vẽ các thành phần của PausePage
+	window.draw(overlay);
+	window.draw(pauseBox);
+	resume.render(window);
+	back.render(window);
 }
