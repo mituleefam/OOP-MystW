@@ -4,7 +4,8 @@ class SpellEffect
 {
 public:
     SpellEffect(const sf::Texture& texture, const sf::Vector2f& pos, sf::Vector2i frameSize, int frameCount, float duration = 0.25f)
-        : sprite(texture), position(pos), frameSize(frameSize), frameCount(frameCount), duration(duration), timer(0.f), active(true), currentFrame(0)
+        : sprite(texture), position(pos), frameSize(frameSize), frameCount(frameCount), duration(duration), timer(0.f), active(true), currentFrame(0),
+        damageDealt(false)
     {
         sprite.setPosition(position);
         sprite.setOrigin(frameSize.x / 2.f, 0.f); // Center X, top Y

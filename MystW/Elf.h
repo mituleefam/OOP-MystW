@@ -4,16 +4,6 @@
 #include <vector>
 #include <map>
 
-//// Forward declare AnimSheetInfo if it's not in a common header
-//struct AnimSheetInfo {
-//    const char* filename;
-//    int frameWidth;
-//    int frameHeight;
-//    int frameCount;
-//    float frameDuration;
-//    bool loop;
-//};
-
 class Elf : public Enemy {
 public:
     Elf(const std::string& assetBaseFolder, float startX, float startY);

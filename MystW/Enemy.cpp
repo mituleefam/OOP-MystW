@@ -31,11 +31,6 @@ void Enemy::update(float deltaTime, Player& player, const CollisionLayer& collis
     // Dying state handling
     if (currentState == EnemyState::Dying) {
         animate(deltaTime);
-        //const Animation& anim = animations[currentState];
-        //// Check if dying animation has finished
-        //if (!anim.frames.empty() && !anim.loop && currentFrame >= static_cast<int>(anim.frames.size()) - 1) {
-        //    isAlive = false; // Now truly dead and won't be updated/drawn further (handled in main loop)
-        //}
         return; // No other logic if dying
     }
 
@@ -63,14 +58,6 @@ void Enemy::update(float deltaTime, Player& player, const CollisionLayer& collis
 }
 
 void Enemy::draw(sf::RenderWindow& window) {
-    //if (!isAlive && currentState != EnemyState::Dying) { // Don't draw if dead, unless it's the dying animation itself
-    //    return;
-    //}
-    //if (currentState == EnemyState::Dying && !animations[EnemyState::Dying].frames.empty() && currentFrame >= static_cast<int>(animations[EnemyState::Dying].frames.size()) - 1) {
-    //    // If dying animation is finished, and isAlive is already set to false, don't draw.
-    //    if (!isAlive) return;
-    //}
-    //window.draw(sprite);
     if (isAlive || currentState == EnemyState::Dying) {
         window.draw(sprite);
     }
@@ -119,15 +106,12 @@ void Enemy::animate(float deltaTime) {
             ? currentAnim.frames.size()
             : currentAnim.textureFrames.size();
 
-        if (currentFrame >= frameCount) {//static_cast<int>(currentAnim.frames.size())) {
+        if (currentFrame >= frameCount) {
             if (currentAnim.loop) {
                 currentFrame = 0;
             }
             else {
-                currentFrame = frameCount - 1;//static_cast<int>(currentAnim.frames.size()) - 1; // Stay on last frame
-                //if (currentState == EnemyState::Attacking || currentState == EnemyState::Attacking2) { // Example: transition from attacking to idle
-                //    setState(EnemyState::Idle);
-                //}
+                currentFrame = frameCount - 1;
                 if (currentState >= EnemyState::Attacking && currentState <= EnemyState::Healing) {
                     setState(EnemyState::Idle); // Quay về Idle sau khi tấn công/hành động xong
                 }
@@ -136,7 +120,7 @@ void Enemy::animate(float deltaTime) {
                 }
             }
         }
-        //sprite.setTextureRect(currentAnim.frames[currentFrame]);
+
         if (currentAnim.type == Animation::AnimationType::SpriteSheet) {
             sprite.setTextureRect(currentAnim.frames[currentFrame]);
         }
@@ -147,21 +131,7 @@ void Enemy::animate(float deltaTime) {
 }
 
 void Enemy::setState(EnemyState newState) {
-    //if (currentState != newState || (newState == EnemyState::Hurt && !isHurting) || (newState == EnemyState::Attacking && currentState != EnemyState::Attacking)) {
-    //    // Allow re-triggering attack/hurt if not already in it
-    //    currentState = newState;
-    //    currentFrame = 0;
-    //    animationTimer = 0.f;
 
-    //    if (animations.count(currentState) && !animations[currentState].frames.empty()) {
-    //        sprite.setTexture(*animations[currentState].sheet); // Ensure correct sheet is set
-    //        sprite.setTextureRect(animations[currentState].frames[0]);
-    //        adjustSpriteOriginAndScale(); // Adjust origin for new frame size potentially
-    //    }
-    //    else {
-    //        // std::cerr << "Warning: No animation frames for state " << static_cast<int>(newState) << std::endl;
-    //    }
-    //}
     if (currentState == newState) return;
 
     currentState = newState;
@@ -217,23 +187,6 @@ void Enemy::adjustSpriteOriginAndScale() {
     // Đặt origin ở chính giữa-dưới của FRAME
     sprite.setOrigin(frameBounds.width / 2.0f, frameBounds.height);
     sprite.setScale(direction * this->baseScale, this->baseScale);
-    //const sf::Texture* currentTexture = sprite.getTexture();
-    //if (!currentTexture) return; // Nếu không có texture thì không làm gì cả
-
-    //// Lấy kích thước của TOÀN BỘ file ảnh texture hiện tại
-    //sf::Vector2u textureSize = currentTexture->getSize();
-
-    //// Lấy textureRect để xử lý trường hợp sprite sheet
-    //sf::IntRect textureRect = sprite.getTextureRect();
-
-    //// Nếu textureRect có kích thước (ví dụ: sprite sheet), dùng nó.
-    //// Nếu không (ví dụ: boss dùng cả file ảnh), dùng kích thước của cả texture.
-    //float width = (textureRect.width != 0) ? textureRect.width : textureSize.x;
-    //float height = (textureRect.height != 0) ? textureRect.height : textureSize.y;
-
-    //// Đặt origin ở chính giữa-đáy của hình ảnh thực tế
-    //sprite.setOrigin(width / 2.0f, height);
-    //sprite.setScale(direction * this->baseScale, this->baseScale);
 }
 
 
@@ -252,15 +205,6 @@ sf::FloatRect Enemy::getBounds() const {
 
 sf::FloatRect Enemy::getHitBox() const {
     //// Generic hitbox calculation, can be overridden by derived classes if needed
-    //sf::FloatRect box = sprite.getGlobalBounds();
-    //float shrinkHorizontal = 0.6f; // Make hitbox 60% of sprite width
-    //float shrinkVertical = 0.6f;   // Make hitbox 60% of sprite height
-
-    //box.left += box.width * (1.0f - shrinkHorizontal) / 2.0f;
-    //box.width *= shrinkHorizontal;
-    //box.top += box.height * (1.0f - shrinkVertical) / 2.0f;
-    //box.height *= shrinkVertical;
-    //return box;
     return sprite.getTransform().transformRect(localHitbox);
 }
 
@@ -323,55 +267,5 @@ void Enemy::handlePhysicsAndCollision(float deltaTime, const CollisionLayer& col
             velocity.y = 0;
         }
     }
-	// BELOW CODE ENEMY IS STUCK, NOT WORKING PROPERLY
-    //const unsigned int TILE_SIZE = 32;
 
-    //// 1. Áp dụng trọng lực
-    //velocity.y += GRAVITY * deltaTime;
-
-    //// 2. Xử lý va chạm theo trục X
-    //position.x += velocity.x * deltaTime;
-    //sf::FloatRect bounds = getHitBox();
-
-    //if (velocity.x > 0) { // Di chuyển sang phải
-    //    if (collisionLayer.isCollidable(bounds.left + bounds.width, bounds.top) ||
-    //        collisionLayer.isCollidable(bounds.left + bounds.width, bounds.top + bounds.height / 2) ||
-    //        collisionLayer.isCollidable(bounds.left + bounds.width, bounds.top + bounds.height))
-    //    {
-    //        position.x = (std::floor((bounds.left + bounds.width) / TILE_SIZE) * TILE_SIZE) - (bounds.width + (bounds.left - position.x)) - 0.1f;
-    //        velocity.x = 0;
-    //    }
-    //}
-    //else if (velocity.x < 0) { // Di chuyển sang trái
-    //    if (collisionLayer.isCollidable(bounds.left, bounds.top) ||
-    //        collisionLayer.isCollidable(bounds.left, bounds.top + bounds.height / 2) ||
-    //        collisionLayer.isCollidable(bounds.left, bounds.top + bounds.height))
-    //    {
-    //        position.x = (std::floor(bounds.left / TILE_SIZE) * TILE_SIZE + TILE_SIZE) - (bounds.left - position.x) + 0.1f;
-    //        velocity.x = 0;
-    //    }
-    //}
-
-    //// 3. Xử lý va chạm theo trục Y
-    //position.y += velocity.y * deltaTime;
-    //bounds = getHitBox(); // Lấy lại hitbox sau khi di chuyển
-    //isOnGround = false;
-
-    //if (velocity.y > 0) { // Rơi xuống
-    //    if (collisionLayer.isCollidable(bounds.left, bounds.top + bounds.height) ||
-    //        collisionLayer.isCollidable(bounds.left + bounds.width, bounds.top + bounds.height))
-    //    {
-    //        position.y = (std::floor((bounds.top + bounds.height) / TILE_SIZE) * TILE_SIZE) - (bounds.height + (bounds.top - position.y));
-    //        velocity.y = 0;
-    //        isOnGround = true;
-    //    }
-    //}
-    //else if (velocity.y < 0) { // Nhảy lên
-    //    if (collisionLayer.isCollidable(bounds.left, bounds.top) ||
-    //        collisionLayer.isCollidable(bounds.left + bounds.width, bounds.top))
-    //    {
-    //        position.y = (std::floor(bounds.top / TILE_SIZE) * TILE_SIZE + TILE_SIZE) - (bounds.top - position.y);
-    //        velocity.y = 0;
-    //    }
-    //}
 }

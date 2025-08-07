@@ -46,14 +46,9 @@ public:
 
     // Pure virtual methods that MUST be implemented by derived classes
     virtual void loadSpecificAssets() = 0;
-    //virtual void performAttackLogic(const sf::Vector2f& playerPos) = 0;
-    //virtual void performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) = 0;
     virtual void performAttackLogic(Player& player) = 0;
-    //virtual void updateAI(float deltaTime, const sf::Vector2f& playerPos) = 0; 
-    //virtual void updateAI(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) = 0; // For specific movement/decision AI
     virtual void updateAI(float deltaTime, Player& player) = 0;
     // Virtual methods that can be overridden (or used as is if base implementation is sufficient)
-    //virtual void update(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox, const CollisionLayer& collisionLayer);
 	virtual void update(float deltaTime, Player& player, const CollisionLayer& collisionLayer);
     virtual void draw(sf::RenderWindow& window);
     virtual void animate(float deltaTime); // Animation logic might be common
@@ -100,7 +95,4 @@ protected:
     void updateFacingDirection(const sf::Vector2f& playerPos);
     virtual void adjustSpriteOriginAndScale(); // For flipping sprite
 
-    // Projectile related members - if many enemies shoot, could be here.
-    // For now, keeping projectiles specific to Elf.
-    // std::vector<AnimatedProjectile> activeProjectiles;
 };

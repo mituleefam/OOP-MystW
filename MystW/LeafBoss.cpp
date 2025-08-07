@@ -152,15 +152,7 @@ void LeafBoss::updateAI(float deltaTime, Player& player) {
     actionTriggeredInState = false;
 
     bool canAttack = attackCooldown.getElapsedTime().asSeconds() > 2.0f;
-    //bool canUseSpecial = specialMoveClock.getElapsedTime().asSeconds() > 7.0f;
 
-    //if (distanceToPlayer < 200.f && canUseSpecial) {
-    //    setState(rand() % 2 == 0 ? EnemyState::Defending : EnemyState::Rolling);
-    //    isDefending = (currentState == EnemyState::Defending);
-    //    isRolling = (currentState == EnemyState::Rolling);
-    //    actionTimer.restart();
-    //    specialMoveClock.restart();
-    //}
     if (canAttack) {
         if (distanceToPlayer < 150.f) {
             setState(EnemyState::Attacking);
@@ -187,22 +179,7 @@ void LeafBoss::updateAI(float deltaTime, Player& player) {
 }
 
 void LeafBoss::performAttackLogic(Player& player) {
-    //if (actionTriggeredInState) return;
 
-    //if (currentState == EnemyState::Attacking) {
-    //    if (currentFrame == 3) {
-    //        if (getHitBox().intersects(player.getHitBox())) {
-    //            player.takeDamage(getAttackDamage(LeafAttackType::Melee));
-    //        }
-    //        actionTriggeredInState = true;
-    //    }
-    //}
-    //else if (currentState == EnemyState::Attacking2 || currentState == EnemyState::Attacking3) {
-    //    if (currentFrame == 5) {
-    //        shootProjectile(currentAttackType, player.getPosition());
-    //        actionTriggeredInState = true;
-    //    }
-    //}
     if (actionTriggeredInState) return;
     lastPlayerTargetPos = player.getPosition(); // Luôn cập nhật vị trí player
 

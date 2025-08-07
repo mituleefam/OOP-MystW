@@ -4,7 +4,6 @@
 #include "SoundPage.hpp"
 #include <iostream>
 
-//MenuState::MenuState(StateManager* sm, sf::RenderWindow* window): states(sm), win(window){
 MenuState::MenuState(StateManager *sm) : states(sm) {
 	win = states->getWindow();
 

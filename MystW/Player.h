@@ -15,8 +15,6 @@ private:
     const float moveSpeed = 600.0f; // Speed of horizontal movement
     const float gravity = 1600.0f;
 	const float fastFallGravity = 3000.0f; // Gravity when fast falling
-	// MODIFIED: No longer need a fixed groundY
-    // const float groundY = 700.0f; // Same as the initial position of the player sprite
 
     float attackCooldown = 0.0f; // Cooldown for attacks
     const float attackCooldownDuration = 0.8f; // 0.8 second cooldown for attacks
@@ -42,26 +40,21 @@ private:
     sf::IntRect dieFrames[6];
     float baseScale;
 	// Unused variables for future use
-	// Unused variables for future use
     const float knockbackForce = 1.0f; // Force applied when the player is attacked
     sf::FloatRect localHitbox;
 public:
     int health = 100; // Player health
 
     sf::Sprite sprite;
-    //sf::Sprite spriteSheet; // For sprite sheet animations
     sf::Vector2f getPosition() const { return sprite.getPosition(); } // Get player position
     void setPosition(float x, float y) { sprite.setPosition(x, y); } // Set player position
     sf::FloatRect getBounds() const { return sprite.getGlobalBounds(); }
     sf::FloatRect getHitBox() const; // Get the hitbox of the player for collision detection
 
-    Player() : velocity(0.0f, 0.0f) {};
+    Player() : velocity(0.0f, 0.0f), baseScale(3.5f) {};
     void Initialize(); // called once per game
     void Load(); // called once per level
-    // MODIFIED: Update now takes the collision layer as a parameter
     void Update(float deltaTime, CollisionLayer& collisionLayer); // called every frame
-    //void Draw(); // called every frame after Update
-    // MODIFIED: Draw now takes the render window
     void Draw(sf::RenderWindow& window);
 
     bool isJumping = false;

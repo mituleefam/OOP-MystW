@@ -96,11 +96,7 @@ void Elf::update(float deltaTime, Player& player, const CollisionLayer& collisio
 }
 
 void Elf::updateAI(float deltaTime, Player& player) {
-    // === THÊM ĐOẠN KIỂM TRA MỚI ===
-    //if (!isOnGround) { // Nếu đang rơi thì không làm gì cả
-    //    velocity.x = 0;
-    //    return;
-    //}
+
     sf::FloatRect playerHitBox = player.getHitBox();
     sf::FloatRect enemyHitBox = getHitBox();
     float playerBottom = playerHitBox.top + playerHitBox.height;
@@ -119,22 +115,6 @@ void Elf::updateAI(float deltaTime, Player& player) {
         velocity.x = 0; // Đứng im khi player chết
         return;
     }
-
-    // Update arrows first (movement and out-of-bounds removal)
-    // For out-of-bounds, ideally use game world dimensions, not direct window ref here.
-    // We'll simulate fixed bounds for arrow removal.
-    // XÓA BỎ HOÀN TOÀN KHỐI CODE NÀY
-    //for (auto& arrow : arrows) {
-    //    arrow.update(deltaTime);
-    //}
-    //arrows.erase(std::remove_if(arrows.begin(), arrows.end(),
-    //    [](const AnimatedProjectile& a) {
-    //        sf::FloatRect b = a.getBounds();
-    //        // Assuming a fixed game world size for arrow removal
-    //        return b.left > 1920 || (b.left + b.width) < 0 ||
-    //            b.top > 1080 || (b.top + b.height) < 0;
-    //    }), arrows.end());
-    // KẾT THÚC PHẦN XÓA
 
     // Basic AI: update facing direction, then decide to run or attack
 	sf::Vector2f playerPos = player.getPosition();
@@ -157,13 +137,10 @@ void Elf::updateAI(float deltaTime, Player& player) {
 
     if (distanceToPlayer < attackRange) {
         setState(EnemyState::Attacking);
-        // performAttackLogic(playerPos); // Initial shot attempt when entering attack state
     }
     else {
         setState(EnemyState::Running);
-        // position.x += direction * speed * deltaTime; // Move towards/away logic can be more complex
-        // For now, simple horizontal move in current direction
-        velocity.x = direction * speed; //*deltaTime; // Move in the facing direction
+        velocity.x = direction * speed;
     }
 }
 
@@ -187,11 +164,7 @@ void Elf::tryShootArrow(const sf::Vector2f& playerPos, const sf::FloatRect& play
     // Example: arrowStartPos.y -= sprite.getGlobalBounds().height * 0.3f; // Adjust based on elf sprite
     arrowStartPos.y -= 80.f; // Manual adjustment based on your old code's visual
 
-    sf::Vector2f shootDir(direction, 0.f); // = playerPos - arrowStartPos;
-    // Minor vertical adjustment to aim towards player's center, not feet
-    // shootDir.y -= playerHitBox.height / 2.f; // Requires player reference or its hitbox passed
-    // For simplicity, let's use the playerPos as is for now or a fixed offset
-    // shootDir.y -= 30.f; // A fixed offset aiming slightly up
+    sf::Vector2f shootDir(direction, 0.f);
 
     normalizeVector(shootDir); // From your Math.h
 
@@ -229,16 +202,6 @@ void Elf::draw(sf::RenderWindow& window) {
 }
 
 sf::FloatRect Elf::getHitBox() const {
-    //sf::FloatRect box = sprite.getGlobalBounds();
-    //float shrinkHorizontal = 0.2f; // Make hitbox 20% of sprite width
-    //float shrinkVertical = 0.2f;   // Make hitbox 20% of sprite height
-
-    //box.left += box.width * (1.0f - shrinkHorizontal) / 2.0f;
-    //box.width *= shrinkHorizontal;
-    //box.top += box.height * 0.7f; // lower multiplicant if aim higher
-    //box.height *= shrinkVertical;
-    //return box;
-
     // Kích thước gốc của frame là 160x100
     float hitboxWidth = 40.f;
     float hitboxHeight = 45.f;

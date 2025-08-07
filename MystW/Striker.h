@@ -19,19 +19,14 @@ public:
 
     // Override virtual functions from base Enemy class
     void loadSpecificAssets() override;
-    //void performAttackLogic(const sf::Vector2f& playerPos) override;
-    //void performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) override;
 	void performAttackLogic(Player& player) override;
-    //void update(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox, const CollisionLayer& collisionLayer) override;
 	void update(float deltaTime, Player& player, const CollisionLayer& collisionLayer) override;
-    //void updateAI(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) override;
     void updateAI(float deltaTime, Player& player) override;
     void draw(sf::RenderWindow& window) override;
 
     sf::FloatRect getHitBox() const override;
 
 	// Striker-specific methods
-    //bool checkAttackCollisions(const sf::FloatRect& playerHitBox) const;
     bool attackRegistered = false;
     bool damageDealtInCurAttack = false; // << THÊM BIẾN CỜ NÀY
 

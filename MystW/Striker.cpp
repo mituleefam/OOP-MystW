@@ -76,41 +76,24 @@ void Striker::loadStateFrames(EnemyState state, const AnimSheetInfo& info) {
     animations[state] = anim;
 }
 
-//void Striker::update(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox, const CollisionLayer& collisionLayer) {
-//    // Now call the base Enemy update for normal behavior
-//    Enemy::update(deltaTime, playerPos, playerHitBox, collisionLayer);
-//}
-
 void Striker::update(float deltaTime, Player& player, const CollisionLayer& collisionLayer) {
     Enemy::update(deltaTime, player, collisionLayer);
 }
 
-void Striker::updateAI(float deltaTime, Player& player) {//const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
-    // === THÊM ĐOẠN KIỂM TRA MỚI ===
-    //if (!isOnGround) { // Nếu đang rơi thì không làm gì cả
-    //    velocity.x = 0;
-    //    return;
-    //}
+void Striker::updateAI(float deltaTime, Player& player) {
+
     sf::FloatRect playerHitBox = player.getHitBox();
     sf::FloatRect enemyHitBox = getHitBox();
     float playerBottom = playerHitBox.top + playerHitBox.height;
     float enemyBottom = enemyHitBox.top + enemyHitBox.height;
 
     if (std::abs(playerBottom - enemyBottom) > VERTICAL_TOLERANCE) {
-    //if (std::abs(playerBottom - this->position.y) > VERTICAL_TOLERANCE) {
-        // Player ở tầng khác, đứng im
+
         setState(EnemyState::Idle);
         velocity.x = 0;
         return;
     }
-    //// =============================
-    //// Nếu player đang bất tử, Striker sẽ đứng im chờ đợi
-    //if (player.isInvincible()) {
-    //    setState(EnemyState::Idle);
-    //    velocity.x = 0;
-    //    return;
-    //}
-    //// ===================================
+
     // Prevent attacking if player is dead
     if (player.isDead()) { // Dòng MỚI
         setState(EnemyState::Idle);
@@ -125,10 +108,7 @@ void Striker::updateAI(float deltaTime, Player& player) {//const sf::Vector2f& p
 
     if (currentState == EnemyState::Attacking) {
 		velocity.x = 0; // Stop moving while attacking
-        // The base animate() will transition to Idle when attack anim finishes if it's non-looping.
-        // performAttackLogic is responsible for the actual shot during this state if cooldown allows.
-        //performAttackLogic(player);//(playerPos, playerHitBox); // Check if it can attack again
-        //return; // Don't change state or move if in attack animation
+
         // === NEW DAMAGE LOGIC ===
         // Define which frame of the animation actually deals damage
         const int HIT_FRAME = 5; // Example: damage on the 5th frame
@@ -159,41 +139,9 @@ void Striker::updateAI(float deltaTime, Player& player) {//const sf::Vector2f& p
     }
     else {
         setState(EnemyState::Running);
-        //std::cout << "Striker DECIDED to RUN" << std::endl;
-        // position.x += direction * speed * deltaTime; // Move towards/away logic can be more complex
-        // For now, simple horizontal move in current direction
         velocity.x = direction * speed;
     }
 }
-
-
-//void Striker::performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
-//    // This is called when the Striker decides to attack (e.g., when state becomes Attacking)
-//    if (attackCooldownTimer.getElapsedTime().asSeconds() >= attackInterval && !attackRegistered) {
-//        if (getHitBox().intersects(playerHitBox)) {
-//            attackRegistered = true;
-//            std::cout << "Striker attacks!\n";
-//        }
-//        attackCooldownTimer.restart();
-//    }
-//    // Reset flag when attack is done
-//    if (currentState != EnemyState::Attacking) {
-//        attackRegistered = false;
-//    }
-//}
-
-//void Striker::performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
-//    // This is called every frame of the attack animation.
-//    // We only register the hit ONCE per animation.
-//    if (!attackRegistered) { // If we haven't landed a hit yet during this attack
-//        if (getHitBox().intersects(playerHitBox)) {
-//            attackRegistered = true;
-//            // DEBUG MESSAGE TO CONFIRM HIT
-//            std::cout << "Striker attack connected with player hitbox!\n";
-//        }
-//    }
-//    // The flag will be reset in updateAI once the state changes away from Attacking.
-//}
 
 void Striker::performAttackLogic(Player& player) {
     // 1. Kiểm tra va chạm
@@ -213,11 +161,6 @@ void Striker::draw(sf::RenderWindow& window) {
     Enemy::draw(window);
 }
 
-//bool Striker::checkAttackCollisions(const sf::FloatRect& playerHitBox) const {
-//    // Check if the striker's hitbox intersects with the player's hitbox
-//    sf::FloatRect strikerHitBox = getHitBox();
-//    return strikerHitBox.intersects(playerHitBox);
-//}
 sf::FloatRect Striker::getHitBox() const {
     // Kích thước gốc của frame là 96x84
     // Định nghĩa hitbox trong không gian gốc (local space)

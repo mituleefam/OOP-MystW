@@ -20,13 +20,3 @@ struct Animation {
     // --- TextureList members (for Bosses) ---
     std::vector<std::shared_ptr<sf::Texture>> textureFrames;
 };
-
-//struct AnimSheetInfo // moved to Enemy.h
-//{
-//    const char* filename;
-//    int frameWidth;
-//    int frameHeight;
-//    int frameCount;
-//    float frameDuration;
-//    bool loop;
-//};

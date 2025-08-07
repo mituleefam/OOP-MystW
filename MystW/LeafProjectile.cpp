@@ -115,11 +115,6 @@ void LeafProjectile::update(float deltaTime) {
         }
     }
 
-    // Check for out of bounds
-    //sf::Vector2f pos = sprite.getPosition();
-    //if (pos.x < -200 || pos.x > 2200 || pos.y > 1400 || pos.y < -200) {
-    //    alive = false;
-    //}
 }
 
 void LeafProjectile::draw(sf::RenderWindow& window) const {

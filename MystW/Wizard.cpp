@@ -102,13 +102,6 @@ void Wizard::update(float deltaTime, Player& player, const CollisionLayer& colli
     // Now call the base Enemy update for normal behavior
     Enemy::update(deltaTime, player, collisionLayer);
 
-    //// Update spell effect if exists
-    //if (lightningStrike) {
-    //    lightningStrike->update(deltaTime);
-    //    if (!lightningStrike->isActive()) {
-    //        lightningStrike.reset();
-    //    }
-    //}
 }
 
 // movement and attack logic
@@ -124,10 +117,6 @@ void Wizard::updateAI(float deltaTime, Player& player) {
 
     float distanceToPlayer = magnitude(playerPos - position); // True distance
 
-    //if (distanceToPlayer > detectionRange && currentState != EnemyState::Attacking && currentState != EnemyState::Attacking2) {
-    //    setState(EnemyState::Idle);
-    //    return; // If player is out of detection range, go idle
-    //}
 
     // Basic AI: update facing direction, then decide to run or attack
     updateFacingDirection(playerPos);
@@ -163,9 +152,6 @@ void Wizard::updateAI(float deltaTime, Player& player) {
     }
     else if (distanceToPlayer < meleeRange) {
         setState(EnemyState::Running);
-        //std::cout << "Wizard runs" << std::endl;
-        // position.x += direction * speed * deltaTime; // Move towards/away logic can be more complex
-        // For now, simple horizontal move in current direction
         velocity.x = direction * speed; //*deltaTime; // Move in the facing direction
     }
     // Priority 4: Stand idle if close but attack is on cooldown
@@ -215,32 +201,8 @@ void Wizard::draw(sf::RenderWindow& window) {
     }
 }
 
-//void Wizard::adjustSpriteOriginAndScale() {
-//    sf::FloatRect localBounds = sprite.getLocalBounds();
-//    float baseScale = 2.5f; // scale factor for the sprite
-//    sprite.setOrigin(localBounds.width / 2.0f, localBounds.height);
-//    sprite.setScale(direction * baseScale, baseScale);
-//}
-
-//bool Wizard::checkSpellCollisions(const sf::FloatRect& playerHitBox) const {
-//    if (lightningStrike && lightningStrike->isActive()) {
-//        return lightningStrike->getHitBox().intersects(playerHitBox);
-//    }
-//    return false;
-//}
 
 sf::FloatRect Wizard::getHitBox() const {
     //// Kích thước gốc của frame là 231x190
-    //float hitboxWidth = 60.f;
-    //float hitboxHeight = 90.f;
-    //float hitboxLeft = (231.f - hitboxWidth) / 2.f;
-    //float hitboxTop = 190.f - hitboxHeight - 48.f;
-
-    //sf::FloatRect localHitbox(hitboxLeft, hitboxTop, hitboxWidth, hitboxHeight);
     return sprite.getTransform().transformRect(localHitbox);
 }
-
-//void Wizard::onSpellHit() {
-//    // Reset unique_ptr, hủy đối tượng spell
-//    lightningStrike.reset();
-//}

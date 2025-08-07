@@ -79,200 +79,6 @@ void Player::Load()
 	}
 }
 
-/*
-void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
-{
-    if (hurtCooldown > 0.0f) {
-        hurtCooldown -= deltaTime;
-        if (hurtCooldown < 0.0f) hurtCooldown = 0.0f;
-    }
-    if (attackCooldown > 0.0f) {
-        attackCooldown -= deltaTime;
-        if (attackCooldown < 0.0f) attackCooldown = 0.0f;
-    }
-
-    static AnimationState prevAnimState = animState;
-
-    if (animState == AnimationState::Die) {
-        int dieFrameCount = sizeof(dieFrames) / sizeof(dieFrames[0]);
-        float dieFrameDuration = frameDuration * 1.5f;
-        animationTimer += deltaTime;
-
-        if (currentFrame < dieFrameCount) {
-            if (animationTimer >= dieFrameDuration) {
-                animationTimer = 0.0f;
-                currentFrame++;
-            }
-            if (currentFrame < dieFrameCount)
-                sprite.setTextureRect(dieFrames[currentFrame]);
-            else if (dieFrameCount > 0) {
-                sprite.setTextureRect(dieFrames[dieFrameCount - 1]);
-            }
-        }
-        velocity.x = 0.f;
-        return;
-    }
-
-    if (isAttacked && animState != AnimationState::Hurting) {
-        isAttacking = false;
-        animState = AnimationState::Hurting;
-        currentFrame = 0;
-        animationTimer = 0.0f;
-        hurtCooldown = hurtCooldownDuration;
-        std::cout << "Player is attacked!" << std::endl;
-    }
-
-    velocity.x = 0.0f;
-
-    if (animState != AnimationState::Hurting && !isAttacking) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            velocity.x += moveSpeed;
-            isFacingRight = true;
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-            velocity.x -= moveSpeed;
-            isFacingRight = false;
-        }
-    }
-
-    int tileSize = collisionLayer.getTileSize();
-    sf::FloatRect playerBounds = getHitBox();
-
-    sprite.move(velocity.x * deltaTime, 0);
-    playerBounds = getHitBox();
-    sf::FloatRect hb = getHitBox();
-    if (hb.left <= 0.f + tileSize / 2.f && velocity.x == 0.f && velocity.y == 0.f) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-
-            return;
-        }
-    }
-
-
-
-    for (int y = playerBounds.top; y < playerBounds.top + playerBounds.height; y += tileSize / 4) {
-        if (velocity.x > 0 && collisionLayer.isCollidable(playerBounds.left + playerBounds.width, y)) {
-            float snapX = ((int)((playerBounds.left + playerBounds.width) / tileSize)) * tileSize - playerBounds.width;
-            sprite.setPosition(snapX, sprite.getPosition().y);
-            velocity.x = 0.f;
-            break;
-        }
-        else if (velocity.x < 0 && collisionLayer.isCollidable(playerBounds.left, y)) {
-            float tileX = std::floor(playerBounds.left / tileSize);
-            float snapX = (tileX + 1) * tileSize;
-            float offset = playerBounds.left - sprite.getPosition().x;
-            sprite.setPosition(snapX - offset, sprite.getPosition().y);
-            velocity.x = 0.f;
-            break;
-        }
-    }
-
-    float currentGravity = (animState == AnimationState::AirAttacking) ? fastFallGravity : gravity;
-    velocity.y += currentGravity * deltaTime;
-
-    sprite.move(0, velocity.y * deltaTime);
-    playerBounds = getHitBox();
-
-    bool onGround = false;
-
-    for (int x = playerBounds.left; x < playerBounds.left + playerBounds.width; x += tileSize / 4) {
-        if (x >= 0 && velocity.y > 0 && collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height)) {
-            // Snap to ground
-            float offset = getHitBox().top - sprite.getPosition().y;
-            float newY = std::floor((getHitBox().top + getHitBox().height) / tileSize) * tileSize - getHitBox().height - offset;
-            sprite.setPosition(sprite.getPosition().x, newY);
-            velocity.y = 0;
-            onGround = true;
-            isJumping = false;
-            break;
-        }
-    }   
-
-
-    if (!onGround) {
-        for (int x = playerBounds.left; x < playerBounds.left + playerBounds.width; x += tileSize / 4) {
-            if (x >= 0 && collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height + 1)) {
-                onGround = true;
-                break;
-            }
-        }
-        isJumping = !onGround;
-    }
-
-
-    if (animState != AnimationState::Hurting) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && onGround) {
-            velocity.y = -jumpSpeed;
-            isJumping = true;
-            onGround = false;
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::J) && !isAttacking && attackCooldown <= 0.0f) {
-            isAttacking = true;
-            attackCooldown = attackCooldownDuration;
-            animState = onGround ? AnimationState::Attacking : AnimationState::AirAttacking;
-            currentFrame = 0;
-            animationTimer = 0.0f;
-        }
-    }
-
-    if (!isAttacking && animState != AnimationState::Hurting) {
-        if (isJumping)
-            animState = AnimationState::Jumping;
-        else if (velocity.x != 0)
-            animState = AnimationState::Running;
-        else
-            animState = AnimationState::Idle;
-    }
-
-    if (animState != prevAnimState) {
-        currentFrame = 0;
-        prevAnimState = animState;
-    }
-
-    int frameCount = 1;
-    float actualFrameDuration = frameDuration;
-    switch (animState) {
-    case AnimationState::Idle: frameCount = 4; break;
-    case AnimationState::Running: frameCount = 6; break;
-    case AnimationState::Jumping: frameCount = 4; break;
-    case AnimationState::AirAttacking: frameCount = 7; actualFrameDuration = frameDuration * 0.3f; break;
-    case AnimationState::Attacking: frameCount = 11; actualFrameDuration = frameDuration * 0.3f; break;
-    case AnimationState::Hurting: frameCount = 3; actualFrameDuration = frameDuration * 0.4f; break;
-    }
-
-    animationTimer += deltaTime;
-    if (animationTimer >= actualFrameDuration) {
-        animationTimer = 0.0f;
-        currentFrame++;
-
-        //std::cout << "State: " << static_cast<int>(animState) << ", Frame: " << currentFrame << ", isAttacking: " << isAttacking << "\n";
-
-        if (currentFrame >= frameCount) {
-            currentFrame = 0;
-            if (animState == AnimationState::Attacking || animState == AnimationState::AirAttacking) {
-                isAttacking = false;
-            }
-            if (animState == AnimationState::Hurting) {
-                isAttacked = false;
-            }
-        }
-    }
-
-    switch (animState) {
-    case AnimationState::Idle: sprite.setTextureRect(idleFrames[currentFrame % 4]); break;
-    case AnimationState::Running: sprite.setTextureRect(runningFrames[currentFrame % 6]); break;
-    case AnimationState::Jumping: sprite.setTextureRect(jumpingFrames[currentFrame % 4]); break;
-    case AnimationState::AirAttacking: sprite.setTextureRect(airAttackingFrames[currentFrame % 7]); break;
-    case AnimationState::Attacking: sprite.setTextureRect(swordAttackingFrames[currentFrame % 11]); break;
-    case AnimationState::Hurting: sprite.setTextureRect(hurtingFrames[currentFrame % 3]); break;
-    default: sprite.setTextureRect(idleFrames[0]); break;
-    }
-
-    float originX = isFacingRight ? 20.0f : 30.0f;
-    sprite.setOrigin(originX, 18.5f);
-    sprite.setScale(isFacingRight ? baseScale : -baseScale, baseScale);
-}
-*/
 void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
 {
     // --- BƯỚC 1: CẬP NHẬT CÁC BỘ ĐẾM THỜI GIAN ---
@@ -314,17 +120,6 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
         }
     }
 
-    //// --- BƯỚC 3: XỬ LÝ LOGIC RIÊNG CHO CÁC TRẠNG THÁI "KHÓA" HÀNH ĐỘNG ---
-    //// Nếu nhân vật chết, chỉ chạy animation và dừng lại.
-    //if (animState == AnimationState::Die) {
-    //    velocity.x = 0; // Ngừng di chuyển ngang.
-    //    // Áp dụng trọng lực để nhân vật rơi xuống nếu chết giữa không trung.
-    //    velocity.y += gravity * deltaTime;
-    //    sprite.move(0, velocity.y * deltaTime); // Chỉ di chuyển theo trục y.
-
-    //    // Xử lý animation cho trạng thái Die
-    //    // (Phần này sẽ được gom chung vào khối animation ở cuối)
-    //}
 
     // --- BƯỚC 4: XỬ LÝ INPUT TỪ NGƯỜI DÙNG ---
     // Chỉ nhận input nếu nhân vật không ở trong các trạng thái bận (chết, bị thương, đang tấn công).
@@ -341,8 +136,6 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
     }
 
     // --- BƯỚC 5: VẬT LÝ VÀ VA CHẠM (PHYSICS & COLLISION) ---
-    // Chỉ áp dụng vật lý nếu nhân vật chưa chết.
-    //if (animState != AnimationState::Die) {
     // Di chuyển ngang và xử lý va chạm tường
     sprite.move(velocity.x * deltaTime, 0);
     sf::FloatRect playerBounds = getHitBox();
@@ -409,7 +202,6 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
 			attackRegistered = false; // Reset attack registered flag
         }
     }
-    //}
 
 
     // --- BƯỚC 7: CẬP NHẬT ANIMATION ---
@@ -497,22 +289,6 @@ void Player::takeDamage(int damage)
 	}
 }
 sf::FloatRect Player::getHitBox() const {
-	//if (health <= 0) {
-	//	// Player is dead, return an empty hitbox
-	//	return sf::FloatRect(0, 0, 0, 0);
-	//} // to stop the enemy from hitting the player when dead
-
-	//sf::FloatRect box = sprite.getGlobalBounds();
- //   float shrinkX = 0.2f; // 20% chiều ngang
- //   float shrinkY = 0.1f; // 10% chiều dọc
- //   box.left += box.width * shrinkX / 2.0f;
- //   box.top += box.height * shrinkY / 2.0f;
- //   box.width *= (1.0f - shrinkX);
- //   box.height *= (1.0f - shrinkY);
- //   return box;
-
-    // Lấy phép biến đổi hiện tại của sprite (vị trí, scale, origin)
-    // và áp dụng nó lên hitbox gốc
     return sprite.getTransform().transformRect(localHitbox);
 }
 void Player::Draw(sf::RenderWindow& window)
@@ -537,9 +313,6 @@ void Player::Draw(sf::RenderWindow& window)
     }
 }
 sf::FloatRect Player::getAttackBounds() const {
-	//     if (animState != AnimationState::Attacking)
-			 //return sf::FloatRect(); // No attack bounds if not attacking;
-			 // No need cause in main loop we check if the player is attacking before calling this function
 	float width = 50.f;
 	float height = 50.f;
 	sf::Vector2f pos = sprite.getPosition();
