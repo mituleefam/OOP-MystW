@@ -5,8 +5,7 @@
 #include "PausePage.hpp"
 #include <iostream>
 // ADDED: Include specific enemy types you want to create
-#include "Elf.h"
-#include "Striker.h"
+#include "EnemyFactory.h"
 
 GameState::GameState(StateManager* sm, sf::RenderWindow* window): win(window), states(sm)
 {
@@ -36,12 +35,32 @@ GameState::GameState(StateManager* sm, sf::RenderWindow* window): win(window), s
 
 	camera = Camera(viewSize, sf::Vector2f(mapWidth, mapHeight)); // Gán lại sau khi có kích thước
 
+	// BẮT ĐẦU GAME VỚI LEVEL 1
+	loadLevel(1);
+
 	// Player
 	player.Initialize();
 	player.Load();
 	player.setPosition(200, 600);
 
 	loadEnemies();
+
+	// Score
+	font.loadFromFile("Assets/Fonts/cursive.ttf");
+	scoreText.setFont(font);
+	scoreText.setCharacterSize(64);
+	scoreText.setFillColor(sf::Color::White);
+	// Đặt vị trí cho text ở góc trên bên phải
+	scoreText.setPosition(1920.f - 300.f, 20.f);
+
+	// CẤU HÌNH CHO DEBUG HITBOX
+	debugHitbox.setFillColor(sf::Color::Transparent);
+	debugHitbox.setOutlineColor(sf::Color::Red);
+	debugHitbox.setOutlineThickness(2.0f);
+	// Cấu hình cho điểm debug
+	debugCollisionPoint.setRadius(4.f);
+	debugCollisionPoint.setFillColor(sf::Color::Green);
+	debugCollisionPoint.setOrigin(4.f, 4.f);
 }
 
 
@@ -92,9 +111,14 @@ void GameState::update(float delta)
 	for (auto it = enemies.begin(); it != enemies.end(); ) {
 		Enemy* currentEnemy = it->get(); // Get raw pointer for convenience
 
-		currentEnemy->update(delta, player.getPosition(), player.getHitBox());
+		//currentEnemy->update(delta, player.getPosition(), player.getHitBox(), collisionLayer);
+		currentEnemy->update(delta, player, collisionLayer);
 
 		if (currentEnemy->isDead()) { // isDead() should mean "animation finished and can be removed"
+			if (currentLevel == 1)
+				scoreManager.incrementScore(100);
+			else if (currentLevel == 2)
+				scoreManager.incrementScore(200);
 			it = enemies.erase(it);
 			std::cout << "Enemy removed from game." << std::endl;
 		}
@@ -108,24 +132,43 @@ void GameState::update(float delta)
 			}
 
 			// Enemy attacks player
-			if (Elf* elf = dynamic_cast<Elf*>(currentEnemy)) {
-				if (elf->checkArrowCollisions(player.getHitBox())) {
-					player.takeDamage(5);
-					elf->removeArrowsCollidingWith(player.getHitBox());
-					std::cout << "Player hit by Elf arrow!" << std::endl;
-				}
-			}
-			if (Striker* striker = dynamic_cast<Striker*>(currentEnemy)) {
-				if (striker->attackRegistered) {
-					player.takeDamage(5);
-					std::cout << "Player hit by Striker!" << std::endl;
-				}
-			}
+			//if (Elf* elf = dynamic_cast<Elf*>(currentEnemy)) {
+			//	if (elf->checkArrowCollisions(player.getHitBox())) {
+			//		player.takeDamage(5);
+			//		elf->removeArrowsCollidingWith(player.getHitBox());
+			//		std::cout << "Player hit by Elf arrow!" << std::endl;
+			//	}
+			//}
+			//if (Striker* striker = dynamic_cast<Striker*>(currentEnemy)) {
+			//	if (striker->attackRegistered && !striker->damageDealtThisAttack) {
+			//		player.takeDamage(5);
+			//		striker->damageDealtThisAttack = true;
+			//		std::cout << "Player hit by Striker!" << std::endl;
+			//	}
+			//}
+			//if (Wizard* wizard = dynamic_cast<Wizard*>(currentEnemy)) {
+			//	if (wizard->checkSpellCollisions(player.getHitBox())) {
+			//		player.takeDamage(10); // Ví dụ sát thương của spell
+			//		wizard->onSpellHit(); // cancel the spell right after it hits
+			//	}
+			//	else if (wizard->getCurrentState() == EnemyState::Attacking2 && wizard->attackRegistered) {
+			//		// Giả sử đòn cận chiến cũng chỉ gây sát thương 1 lần
+			//		// (bạn sẽ cần thêm cờ damageDealtThisAttack cho wizard nếu cần)
+			//		player.takeDamage(5);
+			//		wizard->attackRegistered = false; // Tạm thời reset ngay để tránh loop
+			//	}
+			//}
+			// The enemy now damages the player from within its own updateAI function.
+			// No need for dynamic_cast or calling dealDamage here.
 			++it;
 		}
 	}
+	if (enemies.empty() && currentLevel <= 2) {
+		// All enemies defeated, trigger level transition
+		loadNextLevel();
+	}
 	pause.applyHoverEffect(*win);
-
+	scoreText.setString("Score: " + std::to_string(scoreManager.getScore()));
 	//isAClicked = false;
 	//isDClicked = false;
 }
@@ -144,6 +187,21 @@ void GameState::render(sf::RenderWindow& window)
 	player.Draw(window); // Assuming Player has a Draw method that draws its sprite on the window
 	for (const auto& enemy : enemies) {
 		enemy->draw(window);
+		// VẼ HITBOX CỦA ENEMY RA MÀN HÌNH
+		sf::FloatRect hb = enemy->getHitBox();
+		debugHitbox.setSize(sf::Vector2f(hb.width, hb.height));
+		debugHitbox.setPosition(hb.left, hb.top);
+		window.draw(debugHitbox);
+
+		// === VẼ CÁC ĐIỂM KIỂM TRA VA CHẠM ===
+		// Điểm bên phải
+		debugCollisionPoint.setPosition(hb.left + hb.width, hb.top); window.draw(debugCollisionPoint);
+		debugCollisionPoint.setPosition(hb.left + hb.width, hb.top + hb.height / 2); window.draw(debugCollisionPoint);
+		debugCollisionPoint.setPosition(hb.left + hb.width, hb.top + hb.height); window.draw(debugCollisionPoint);
+		// Điểm bên trái
+		debugCollisionPoint.setPosition(hb.left, hb.top); window.draw(debugCollisionPoint);
+		debugCollisionPoint.setPosition(hb.left, hb.top + hb.height / 2); window.draw(debugCollisionPoint);
+		debugCollisionPoint.setPosition(hb.left, hb.top + hb.height); window.draw(debugCollisionPoint);
 	}
 
 	// Draw UI on top of everything
@@ -151,16 +209,75 @@ void GameState::render(sf::RenderWindow& window)
 	pause.render(window);
 	// Ví dụ sau này có thể vẽ thêm:
 	// scoreText.draw(window);
+	window.draw(scoreText);
 	// healthBar.draw(window);
 }
 
 // ADDED: Implementation for loading enemies
 void GameState::loadEnemies() {
-	// This is where you can create various enemies for the level
-	// Example: Create an Elf and a Striker
-	// Note: You need to include "Elf.h" and "Striker.h"
-	// The positions (e.g., 1000, 800) need to be adjusted to fit your map
-	// enemies.emplace_back(std::make_unique<Elf>("Assets/Enemy/Elf/Textures", 1000.0f, 800.0f));
-	// enemies.emplace_back(std::make_unique<Striker>("Assets/Enemy/Striker/Textures", 1200.0f, 880.0f));
-	std::cout << "Enemies loaded (example code is commented out)." << std::endl;
+	enemies.clear();
+	if (currentLevel == 1)
+	{
+		enemies.emplace_back(EnemyFactory::createEnemy("Elf", 2000.0f, 900.0f));
+		enemies.emplace_back(EnemyFactory::createEnemy("Striker", 3000.0f, 900.0f));
+		enemies.emplace_back(EnemyFactory::createEnemy("Wizard", 2400.0f, 900.0f));
+		//enemies.emplace_back(EnemyFactory::createEnemy("LeafBoss", 2400.0f, 900.0f));
+		//enemies.emplace_back(EnemyFactory::createEnemy("WaterBoss", 2400.0f, 900.0f));
+	}
+	else if (currentLevel == 2)
+	{
+		enemies.emplace_back(EnemyFactory::createEnemy("Wizard", 1000.0f, 900.0f));
+	}
+	else if (currentLevel == 3)
+	{
+		enemies.emplace_back(EnemyFactory::createEnemy("LeafBoss", 2400.0f, 900.0f));
+		enemies.emplace_back(EnemyFactory::createEnemy("WaterBoss", 2400.0f, 900.0f));
+	}
+	// Add more as needed
+	std::cout << "Enemies loaded for level " << currentLevel << std::endl;
+}
+
+void GameState::loadLevel(int level) {
+	currentLevel = level;
+
+	// Tạo tên file map dựa trên level
+	std::string mapFile = "map" + std::to_string(level) + ".csv";
+	std::string collisionFile = "Collision" + std::to_string(level) + ".csv";
+
+	// Load map và collision cho level mới
+	if (!tileSet.load("image/tile/tileset.png", mapFile, 32, win->getView().getSize())) {
+		std::cout << "Failed to load tileset for level " << level << std::endl;
+	}
+	collisionLayer.load(collisionFile, 32);
+
+	// Reset vị trí người chơi
+	player.setPosition(200, 600); // Hoặc vị trí bắt đầu của từng màn
+
+	// Reset camera
+	float mapWidth = tileSet.getMapWidth() * 32;
+	float mapHeight = tileSet.getMapHeight() * 32;
+	camera = Camera(win->getView().getSize(), sf::Vector2f(mapWidth, mapHeight));
+
+	// Load enemy cho level mới
+	loadEnemies();
+}
+
+void GameState::loadNextLevel() {
+	const int MAX_LEVELS = 2; // Ví dụ game của bạn có 2 level
+
+	if (currentLevel < MAX_LEVELS) {
+		// Load level tiếp theo
+		loadLevel(currentLevel + 1);
+	}
+	else {
+		// Đã hoàn thành tất cả các level!
+		std::cout << "Congratulations! You have completed the game!" << std::endl;
+
+		// Lưu điểm cuối cùng vào high score
+		ScoreManager::addScore(scoreManager.getScore());
+
+		// Quay về Menu chính
+		states->popState(); // Xóa GameState hiện tại
+		// Tùy chọn: có thể push một state "You Win" vào đây
+	}
 }

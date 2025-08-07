@@ -19,7 +19,7 @@ private:
     // const float groundY = 700.0f; // Same as the initial position of the player sprite
 
     float attackCooldown = 0.0f; // Cooldown for attacks
-    const float attackCooldownDuration = 1.1f; // 1.1 second cooldown for attacks
+    const float attackCooldownDuration = 0.8f; // 0.8 second cooldown for attacks
     float hurtCooldown = 0.0f;
     const float hurtCooldownDuration = 1.0f; // 1 second of invincibility
 
@@ -40,11 +40,11 @@ private:
     sf::IntRect swordAttackingFrames[11];
     sf::IntRect hurtingFrames[3];
     sf::IntRect dieFrames[6];
-
+    float baseScale;
 	// Unused variables for future use
 	// Unused variables for future use
     const float knockbackForce = 1.0f; // Force applied when the player is attacked
-
+    sf::FloatRect localHitbox;
 public:
     int health = 100; // Player health
 
@@ -70,5 +70,7 @@ public:
     bool attackRegistered = false; // To prevent multiple attack registrations
     sf::FloatRect getAttackBounds() const;
     void takeDamage(int damage);
+    bool isDead() const;
+    AnimationState getAnimState() const { return animState; }
 };
 

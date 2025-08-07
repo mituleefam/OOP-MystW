@@ -5,6 +5,12 @@
 
 const std::string ScoreManager::fileName = "scores.txt";
 std::vector<int> ScoreManager::scores;
+
+ScoreManager::ScoreManager() : score(0)
+{
+	loadScore();
+}
+
 void ScoreManager::loadScore()
 {
 	scores.clear();
@@ -50,4 +56,19 @@ std::vector<int> ScoreManager::getTopScore()
 {
 	loadScore();
 	return scores;
+}
+
+void ScoreManager::incrementScore(int amount)
+{
+	score += amount;
+}
+
+void ScoreManager::resetScore()
+{
+	score = 0;
+}
+
+int ScoreManager::getScore() const
+{
+	return score;
 }

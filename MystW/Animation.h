@@ -4,19 +4,29 @@
 #include <vector>
 
 struct Animation {
+    // A way to identify the type of animation
+    enum class AnimationType {
+        SpriteSheet, // Uses one texture sheet and IntRects
+        TextureList  // Uses a list of separate textures
+    };
     /*std::vector<std::shared_ptr<sf::Texture>> frames;*/
-    std::shared_ptr<sf::Texture> sheet;
-    std::vector<sf::IntRect> frames;
+    AnimationType type = AnimationType::SpriteSheet; // Default to SpriteSheet
     float frameDuration = 0.1f;
     bool loop = true;
+    // --- SpriteSheet members (for Enemy) ---
+    std::shared_ptr<sf::Texture> sheet;
+    std::vector<sf::IntRect> frames;
+
+    // --- TextureList members (for Bosses) ---
+    std::vector<std::shared_ptr<sf::Texture>> textureFrames;
 };
 
-struct AnimSheetInfo
-{
-    const char* filename;
-    int frameWidth;
-    int frameHeight;
-    int frameCount;
-    float frameDuration;
-    bool loop;
-};
+//struct AnimSheetInfo // moved to Enemy.h
+//{
+//    const char* filename;
+//    int frameWidth;
+//    int frameHeight;
+//    int frameCount;
+//    float frameDuration;
+//    bool loop;
+//};

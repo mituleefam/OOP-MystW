@@ -14,7 +14,8 @@ public:
     void update(float dt);
     void draw(sf::RenderWindow& window) const;
     sf::FloatRect getBounds() const;
-
+	bool isExpired() const;
+    float lifetime;
     sf::FloatRect getHitBox() const;
 private:
     sf::Sprite sprite;
@@ -23,5 +24,6 @@ private:
     float frameDuration;
     float elapsedTime = 0.f;
     int currentFrame = 0;
+    sf::Clock lifeTimer;
 };
 

@@ -13,7 +13,7 @@ public:
     bool load(const std::string& collisionPath, unsigned int tileSize);
 
     // Kiểm tra xem một tile tại tọa độ (x, y) có phải là vật cản không
-    bool isCollidable(int x, int y);
+    bool isCollidable(int x, int y) const;
 
     // Lấy kích thước của một tile
     unsigned int getTileSize() const;

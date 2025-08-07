@@ -22,9 +22,9 @@ public:
     // Override virtual functions from base Enemy class
     void loadSpecificAssets() override;
     //void performAttackLogic(const sf::Vector2f& playerPos) override;
-    void performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) override;
-    void update(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) override;
-    void updateAI(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) override;
+    void performAttackLogic(Player& player) override;
+    void update(float deltaTime, Player& player, const CollisionLayer& collisionLayer) override;
+    void updateAI(float deltaTime, Player& player) override;
     void draw(sf::RenderWindow& window) override; // To draw arrows
 
     sf::FloatRect getHitBox() const override;

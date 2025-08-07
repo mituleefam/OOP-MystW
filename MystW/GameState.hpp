@@ -11,6 +11,7 @@
 #include "Enemy.h"  // ADDED: Include the base Enemy header
 #include <vector>   // ADDED: To hold enemies
 #include <memory>   // ADDED: For smart pointers
+#include "ScoreManager.hpp"
 
 class GameState : public State
 {
@@ -34,6 +35,20 @@ private:
 	//---ADDED:Camera ---
 	Camera camera;
 
+	// Level
+	int currentLevel = 1; // Track current level
+
+	// Score
+	ScoreManager scoreManager;
+	sf::Font font;
+	sf::Text scoreText;
+
+	//sf::View gameView;
+	sf::Texture groundTexture;
+	sf::Sprite groundSprite;
+
+	sf::RectangleShape debugHitbox;
+	sf::CircleShape debugCollisionPoint;
 public:
 	GameState(StateManager* sm, sf::RenderWindow* window);
 	void handleEvent(sf::Event& event) override;
@@ -42,4 +57,7 @@ public:
 
 	// ADDED: Helper function to load enemies
 	void loadEnemies();
+	// Level
+	void loadLevel(int level);
+	void loadNextLevel();
 };

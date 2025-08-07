@@ -38,7 +38,7 @@ bool CollisionLayer::load(const std::string& collisionPath, unsigned int tileSiz
     return true;
 }
 
-bool CollisionLayer::isCollidable(int x, int y) {
+bool CollisionLayer::isCollidable(int x, int y) const {
     int tileX = static_cast<int>(std::floor(x / static_cast<float>(m_tileSize)));
     int tileY = static_cast<int>(std::floor(y / static_cast<float>(m_tileSize)));
 
