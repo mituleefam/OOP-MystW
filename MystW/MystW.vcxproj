@@ -132,6 +132,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Game\Game\LoseState.hpp" />
+    <ClInclude Include="..\..\..\Game\Game\WinState.hpp" />
     <ClInclude Include="AnimatedProjectile.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Background.hpp" />
@@ -148,10 +150,7 @@
     <ClInclude Include="MenuScene.hpp" />
     <ClInclude Include="MenuState.hpp" />
     <ClInclude Include="PausePage.hpp" />
-    <ClInclude Include="PauseScene.hpp" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="Scene.hpp" />
-    <ClInclude Include="SceneManager.hpp" />
     <ClInclude Include="ScoreManager.hpp" />
     <ClInclude Include="SoundPage.hpp" />
     <ClInclude Include="SpellEffect.h" />
@@ -166,6 +165,8 @@
     <ClInclude Include="Wizard.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Game\Game\LoseState.cpp" />
+    <ClCompile Include="..\..\..\Game\Game\WinState.cpp" />
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Camera.cpp" />
