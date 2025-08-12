@@ -11,6 +11,10 @@ SoundPage::SoundPage(StateManager* sm) : states(sm)
 	auto scaleX = viewSize.x / 800.f;
 	auto scaleY = viewSize.y / 600.f;
 
+	exitTex.loadFromFile("image/icon/exit.png");
+	exit.setIcon(exitTex, 580.f * scaleX, 130.f * scaleY, 24.0f * scaleX);
+	exit.setShape(580.f * scaleX, 130.f * scaleY, 25.f * scaleX, 30.f * scaleY);
+
 	if (!volOn.loadFromFile("image/icon/volumeOn_icon.png"))
 		std::cout << "Cannot load volume on \n";
 	if (!volOff.loadFromFile("image/icon/volumeOff_icon.png"))
@@ -66,6 +70,9 @@ void SoundPage::handleEvent(sf::Event& event)
 		isDragging = false;
 		sliderKnob.setFillColor(sf::Color(255, 255, 255));
 	}
+
+	if (exit.isClicked(*win, event))
+		states->popState();
 }
 
 void SoundPage::update(float delta) {
@@ -81,6 +88,7 @@ void SoundPage::update(float delta) {
 		sliderKnob.setPosition(barX + (curVol / 100.0f) * barWidth, sliderKnob.getPosition().y);
 		track.setSize({ curVol / 100.0f * slideBar.getSize().x , 8.f*scaleY });
 	}
+	exit.applyHoverEffect(*win);
 }
 
 void SoundPage::render(sf::RenderWindow& window)
@@ -103,4 +111,6 @@ void SoundPage::render(sf::RenderWindow& window)
 	final.setString("Press Esc to out");
 	final.setPosition(260 * scaleX, (150 + 3 * 60 + 60) * scaleY);
 	window.draw(final);
+	exit.render(window);
+
 }

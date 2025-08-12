@@ -17,6 +17,8 @@ int main()
     StateManager manager(&window, &uiView); // Truyền uiView vào StateManager
     // manager.pushState(std::make_unique<MenuState>(&manager, &window));
     manager.pushState(std::make_unique<MenuState>(&manager));
+    AudioManager::getInstance()->setGlobalVolume(50.0f);
+    AudioManager::getInstance()->playMenuMusic();
 
     sf::Clock clock;
 

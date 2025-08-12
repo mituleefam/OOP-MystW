@@ -283,6 +283,7 @@ void Player::takeDamage(int damage)
 		}
 
 		std::cout << "Player took " << damage << " damage!" << std::endl;
+        isAttacked = true;
 	}
 	else {
 		std::cout << "Player is still recovering (hurtCooldown active)!" << std::endl;

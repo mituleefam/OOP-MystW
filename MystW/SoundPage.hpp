@@ -14,6 +14,10 @@ private:
 	sf::RectangleShape slideBar;
 	sf::RectangleShape track;
 	sf::CircleShape sliderKnob;
+	bool isExitClicked = false;
+	Button exit;
+	sf::Texture exitTex;
+
 	float curVol = 50.0f;
 	float minVol = 0.f;
 	float maxVol = 100.0f;

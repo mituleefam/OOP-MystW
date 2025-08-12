@@ -3,6 +3,7 @@
 #include "State.hpp"
 #include "StateManager.hpp"
 #include "Button.hpp"
+#include "AudioManager.hpp"
 
 class MenuState : public State
 {

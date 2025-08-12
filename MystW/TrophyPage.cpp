@@ -8,6 +8,11 @@ TrophyPage::TrophyPage(StateManager* sm) : states(sm)
 
 	float scaleX = 1920.0f / 800.0f;
 	float scaleY = 1080.0f / 600.0f;
+
+	exitTex.loadFromFile("image/icon/exit.png");
+	exit.setIcon(exitTex, 590.f * scaleX, 130.f * scaleY, 24.0f * scaleX);
+	exit.setShape(590.f * scaleX, 130.f * scaleY, 25.f * scaleX, 30.f * scaleY);
+
 	trophyBox.setSize(sf::Vector2f(1000, 600));
 	trophyBox.setFillColor(sf::Color(250, 243, 224, 255));
 	trophyBox.setOutlineColor(sf::Color(255, 224, 130, 255));
@@ -59,9 +64,13 @@ void TrophyPage::handleEvent(sf::Event& event)
 {
 	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 		states->popState();
+	if (exit.isClicked(*win, event))
+		states->popState();
 }
 
-void TrophyPage::update(float delta){}
+void TrophyPage::update(float delta){
+	exit.applyHoverEffect(*win);
+}
 
 void TrophyPage::render(sf::RenderWindow& window)
 {
@@ -70,4 +79,5 @@ void TrophyPage::render(sf::RenderWindow& window)
 	window.draw(trophyBox);
 	for (auto text : scoreText)
 		window.draw(text);
+	exit.render(window);
 }

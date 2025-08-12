@@ -12,7 +12,11 @@
 #include <vector>   // ADDED: To hold enemies
 #include <memory>   // ADDED: For smart pointers
 #include "ScoreManager.hpp"
-
+#include "WinState.hpp"
+#include "LoseState.hpp"
+#include "HealthBar.h"
+#include <sstream>
+#include <iomanip>
 class GameState : public State
 {
 private:
@@ -22,6 +26,10 @@ private:
 	bool isAClicked = false, isDClicked = false;
 	Button pause;
 	sf::Texture pauseTex;
+	sf::Font font;
+	sf::Text timerText;
+	sf::Clock gameClock;
+	HealthBar* hp;
 
 
 	//Hoang's properies
@@ -40,7 +48,6 @@ private:
 
 	// Score
 	ScoreManager scoreManager;
-	sf::Font font;
 	sf::Text scoreText;
 
 	//sf::View gameView;
@@ -50,7 +57,7 @@ private:
 	sf::RectangleShape debugHitbox;
 	sf::CircleShape debugCollisionPoint;
 public:
-	GameState(StateManager* sm, sf::RenderWindow* window);
+	GameState(StateManager* sm);
 	void handleEvent(sf::Event& event) override;
 	void update(float delta) override;
 	void render(sf::RenderWindow& window) override;

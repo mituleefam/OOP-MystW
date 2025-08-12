@@ -7,22 +7,35 @@
 // ADDED: Include specific enemy types you want to create
 #include "EnemyFactory.h"
 
-GameState::GameState(StateManager* sm, sf::RenderWindow* window): win(window), states(sm)
+GameState::GameState(StateManager* sm): states(sm)
 {
+	win = states->getWindow();
+	float maxHP = 100;
 	background.loadStage("image/backgroundGame", *win);
 	pauseTex.loadFromFile("image/icon/pause_icon.png");
-
-	sf::Vector2f viewSize = window->getView().getSize();
+	sf::Vector2f viewSize = (*states->getUiView()).getSize();
 	float scaleX = viewSize.x / 800.f;
 	float scaleY = viewSize.y / 600.f;
 
 	pause.setIcon(pauseTex, 15.f * scaleX, 15.f * scaleY, 24.0f * scaleX);
 	pause.setShape(15.f * scaleX, 15.f * scaleY, 25.f * scaleX, 30.f * scaleY);
 
+	sf::FloatRect textRect = timerText.getLocalBounds();
+	timerText.setOrigin(textRect.width / 2.0f, textRect.height / 2.0f);
+	timerText.setPosition(300.f * scaleX, 15.f * scaleY);
+
+	if (!font.loadFromFile("font/Merriweather-VariableFont_opsz,wdth,wght.ttf"))
+		std::cout << "cannot load font MerriWeather \n";
+	hp = new HealthBar(maxHP, sf::Vector2f(150, 50), sf::Vector2f(200, 20), &font);
+
+	timerText.setFont(font);
+	timerText.setCharacterSize(50);
+	timerText.setFillColor(sf::Color::Red);
+
 	const unsigned int TILE_SIZE = 32;
 
 	// Load tileset trước để lấy kích thước
-	if (!tileSet.load("image/tile/tileset.png", "map1.csv", TILE_SIZE, window->getView().getSize())) {
+	if (!tileSet.load("image/tile/tileset.png", "map1.csv", TILE_SIZE, win->getView().getSize())) {
 		std::cout << "Failed to load tileset!" << std::endl;
 	}
 
@@ -46,7 +59,7 @@ GameState::GameState(StateManager* sm, sf::RenderWindow* window): win(window), s
 	loadEnemies();
 
 	// Score
-	font.loadFromFile("Assets/Fonts/cursive.ttf");
+	font.loadFromFile("font/cursive.ttf");
 	scoreText.setFont(font);
 	scoreText.setCharacterSize(64);
 	scoreText.setFillColor(sf::Color::White);
@@ -86,6 +99,16 @@ void GameState::handleEvent(sf::Event& event)
 		// states->pushState(std::make_unique<PausePage>(states,win));
 		states->pushState(std::make_unique<PausePage>(states));
 	}
+	if (scoreManager.getScore() == 100)
+	{
+		states->pushState(std::make_unique<WinState>(states));
+		AudioManager::getInstance()->playWinMusic();
+	}
+	if (player.health == 0)
+	{
+		states->pushState(std::make_unique<LoseState>(states));
+		AudioManager::getInstance()->playLoseMusic();
+	}
 }
 
 void GameState::update(float delta)
@@ -107,6 +130,21 @@ void GameState::update(float delta)
 	// GỌI HÀM UPDATE MỚI CỦA BACKGROUND
 	// Truyền vào tâm của camera
 	background.update(camera.getView().getCenter());
+	sf::Time elapsed = gameClock.getElapsedTime();
+	int totalSeconds = static_cast<int>(elapsed.asSeconds());
+	int minutes = totalSeconds / 60;
+	int seconds = totalSeconds % 60;
+
+	std::stringstream ss;
+	ss << std::setw(2) << std::setfill('0') << minutes << ":"
+		<< std::setw(2) << std::setfill('0') << seconds;
+	timerText.setString(ss.str());
+
+	if (player.isAttacked == true)
+	{
+		hp->setCurrentHealth(player.health);
+		player.isAttacked = false;
+	}
 
 	for (auto it = enemies.begin(); it != enemies.end(); ) {
 		Enemy* currentEnemy = it->get(); // Get raw pointer for convenience
@@ -116,9 +154,9 @@ void GameState::update(float delta)
 
 		if (currentEnemy->isDead()) { // isDead() should mean "animation finished and can be removed"
 			if (currentLevel == 1)
-				scoreManager.incrementScore(100);
+				scoreManager.incrementScore(5);
 			else if (currentLevel == 2)
-				scoreManager.incrementScore(200);
+				scoreManager.incrementScore(10);
 			it = enemies.erase(it);
 			std::cout << "Enemy removed from game." << std::endl;
 		}
@@ -207,6 +245,8 @@ void GameState::render(sf::RenderWindow& window)
 	// Draw UI on top of everything
 	window.setView(*states->getUiView()); // << ĐÂY LÀ BƯỚC QUAN TRỌNG NHẤT
 	pause.render(window);
+	hp->draw(window);
+	window.draw(timerText);
 	// Ví dụ sau này có thể vẽ thêm:
 	// scoreText.draw(window);
 	window.draw(scoreText);

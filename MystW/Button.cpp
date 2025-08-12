@@ -27,7 +27,7 @@ sf::Color Button::hexToColor(std::string& color)
 	}
 	return sf::Color(r, g, b, a);
 }
-void  Button :: setText(const sf::Font& font, const std::string& name)
+void  Button::setText(const sf::Font& font, const std::string& name)
 {
 	text.setFont(font);
 	text.setString(name);
@@ -36,11 +36,14 @@ void  Button :: setText(const sf::Font& font, const std::string& name)
 	//Center the text
 	sf::FloatRect textBound = text.getLocalBounds();
 	text.setOrigin(textBound.width / 2, textBound.height / 2);
-	text.setPosition(shape.getPosition().x + shape.getSize().x / 2, shape.getPosition().y -10 +  shape.getSize().y / 2);
+	text.setPosition(shape.getPosition().x + shape.getSize().x / 2, shape.getPosition().y - 10 + shape.getSize().y / 2);
 }
 
-void Button::setShape(float x, float y, float width, float height)
+void Button::setShape(float x, float y, float width, float height, std::string outlineCol, std::string backgroundCol)
 {
+	outlineColor = outlineCol;
+	backgroundColor = backgroundCol;
+
 	shape.setPosition(x, y);
 	shape.setSize({ width,height });
 	shape.setOutlineColor(hexToColor(outlineColor));
@@ -78,18 +81,20 @@ bool Button::isHovered(sf::RenderWindow& window)
 
 }
 
-void Button::applyHoverEffect(sf::RenderWindow& window)
+void Button::applyHoverEffect(sf::RenderWindow& window, std::string hoverCol, std::string backgroundCol)
 {
-		if (isHovered(window))
-		{
-			shape.setFillColor(hexToColor(hoverColor));
-			shape.setScale(1.1f, 1.1f);
-		}
-		else
-		{
-			shape.setFillColor(hexToColor(backgroundColor));
-			shape.setScale(1.0f, 1.0f);
-		}
+	if (isHovered(window))
+	{
+		hoverColor = hoverCol;
+		shape.setFillColor(hexToColor(hoverColor));
+		shape.setScale(1.1f, 1.1f);
+	}
+	else
+	{
+		backgroundColor = backgroundCol;
+		shape.setFillColor(hexToColor(backgroundColor));
+		shape.setScale(1.0f, 1.0f);
+	}
 }
 
 bool Button::isClicked(sf::RenderWindow& window, sf::Event& event)

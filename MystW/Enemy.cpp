@@ -17,10 +17,14 @@ Enemy::Enemy(float startX, float startY, int initialHealth, float enemySpeed)
     baseScale(3.0f),
     isAlive(true),
     isHurting(false),
+    showHealthBar(false),
     hurtDuration(0.7f) // Default hurt duration, can be overridden
 {
     sprite.setPosition(position);
     // Derived class will call loadSpecificAssets() and then likely setState(EnemyState::Idle)
+    sf::Vector2f healthBarSize(50.f, 6.f);
+    // Khởi tạo nhưng không truyền font để nó không vẽ text
+    healthBar = std::make_unique<HealthBar>(maxHealth, sf::Vector2f(0, 0), healthBarSize, nullptr);
 }
 
 void Enemy::update(float deltaTime, Player& player, const CollisionLayer& collisionLayer) {
@@ -32,6 +36,22 @@ void Enemy::update(float deltaTime, Player& player, const CollisionLayer& collis
     if (currentState == EnemyState::Dying) {
         animate(deltaTime);
         return; // No other logic if dying
+    }
+
+    if (healthBar) {
+        // Lấy biên của sprite để định vị thanh máu
+        sf::FloatRect spriteBounds = sprite.getGlobalBounds();
+        // Căn giữa thanh máu và đặt nó phía trên đầu sprite 10 pixel
+        sf::Vector2f healthBarPos(
+            spriteBounds.left + (spriteBounds.width / 2.f) - (healthBar->getSize().x / 2.f), 
+            spriteBounds.top - 15.f
+        );
+        healthBar->setPosition(healthBarPos);
+
+        // Chỉ hiện thanh máu khi quái bị thương và chưa chết
+        if (isHurting && health > 0) {
+            showHealthBar = true;
+        }
     }
 
     // Hurting state handling
@@ -60,17 +80,24 @@ void Enemy::update(float deltaTime, Player& player, const CollisionLayer& collis
 void Enemy::draw(sf::RenderWindow& window) {
     if (isAlive || currentState == EnemyState::Dying) {
         window.draw(sprite);
+        if (showHealthBar && healthBar) {
+            healthBar->draw(window);
+        }
     }
 }
 
 void Enemy::takeDamage(int damageAmount) {
     if (!isAlive || isHurting || currentState == EnemyState::Dying) {
         return; // Can't take damage if already dead, hurting, or in the process of dying
+
     }
 
     health -= damageAmount;
     isHurting = true;
     hurtTimer.restart();
+    if (healthBar) {
+        healthBar->setCurrentHealth(health);
+    }
     std::cout << "Enemy took " << damageAmount << " damage. Health: " << health << std::endl;
 
 

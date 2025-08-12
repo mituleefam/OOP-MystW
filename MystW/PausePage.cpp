@@ -54,6 +54,7 @@ void PausePage::update(float delta)
 	{
 		// states->pushState(std::make_unique<MenuState>(states, win));
 		states->pushState(std::make_unique<MenuState>(states));
+		AudioManager::getInstance()->playMenuMusic();
 		isHomeClicked = false;
 		return;
 	}

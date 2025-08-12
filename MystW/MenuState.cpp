@@ -51,7 +51,8 @@ void MenuState::handleEvent(sf::Event& event)
 	if (play.isClicked(*win, event))
 	{
 		std::cout << "Game state is clicked\n";
-		states->pushState(std::make_unique<GameState>(states, win));
+		states->pushState(std::make_unique<GameState>(states));
+		AudioManager::getInstance()->playGameMusic();
 	}
 
 	if (exit.isClicked(*win, event))

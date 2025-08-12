@@ -7,6 +7,7 @@
 #include "Animation.h" // Assuming Animation.h contains your Animation struct
 #include "AnimatedProjectile.h" // For potential common projectile management later
 #include "CollisionLayer.hpp"
+#include "HealthBar.h"
 
 class Player;
 // Enum for general enemy states
@@ -73,6 +74,9 @@ protected:
     sf::Vector2f velocity;
     bool isOnGround;
     // ===================================
+
+    std::unique_ptr<HealthBar> healthBar;
+    bool showHealthBar;
 
     float speed;
     int health;
