@@ -3,7 +3,7 @@
 #include "State.hpp"
 #include "StateManager.hpp"
 #include "Button.hpp"
-
+#include "AudioManager.hpp"
 class SoundPage : public State
 {
 private:
