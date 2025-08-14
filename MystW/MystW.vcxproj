@@ -204,9 +204,12 @@
     <Text Include="scores.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="image\backgroundGame\background_0.png" />
-    <Image Include="image\backgroundGame\background_1.png" />
-    <Image Include="image\backgroundGame\background_2.png" />
+    <Image Include="image\backgroundGame1\background_0.png" />
+    <Image Include="image\backgroundGame1\background_1.png" />
+    <Image Include="image\backgroundGame1\background_2.png" />
+    <Image Include="image\backgroundGame2\background_0.png" />
+    <Image Include="image\backgroundGame2\background_1.png" />
+    <Image Include="image\backgroundGame2\background_2.png" />
     <Image Include="image\icon\home_icon.png" />
     <Image Include="image\icon\pause_icon.png" />
     <Image Include="image\icon\resume_icon.png" />
@@ -217,6 +220,8 @@
     <Image Include="image\icon\volumeOff_icon.png" />
     <Image Include="image\icon\volumeOn_icon.png" />
     <Image Include="image\Menu\backgroundMenu.jpg" />
+    <Image Include="image\tile\tileset1.png" />
+    <Image Include="image\tile\tileset2.png" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="font\cursive.ttf" />

@@ -10,11 +10,11 @@ const std::map<EnemyState, AnimSheetInfo> Striker::strikerAnimSheetInfos = {
     { EnemyState::Running,     { "Run.png",    96, 84, 8, 0.08f,  true  }}, // Faster run animation
     { EnemyState::Attacking,   { "Attack.png", 96, 84, 11, 0.1f, false }}, // Non-looping attack
     { EnemyState::Hurt,        { "Hurt.png",   96, 84, 4, 0.15f, false }},
-    { EnemyState::Dying,       { "Die.png",    96, 84, 12, 0.5f,  false }}
+    { EnemyState::Dying,       { "Die.png",    96, 84, 12, 0.25f,  false }}
 };
 
 Striker::Striker(const std::string& assetBaseFolder, float startX, float startY)
-    : Enemy(startX, startY, 5, 120.0f), // Base constructor: x, y, max health, speed
+    : Enemy(startX, startY, 1, 120.0f), // Base constructor: x, y, max health, speed
     baseAssetPath(assetBaseFolder),
     attackInterval(1.f), // Striker attacks every second
     attackRange(160.0f)  // Striker attacks if player is within 170px
@@ -22,7 +22,7 @@ Striker::Striker(const std::string& assetBaseFolder, float startX, float startY)
     baseScale = 3.0f;
 	speed = 500.0f; // Override speed for Striker
 
-    hurtDuration = 0.6f; // Strikers recover a bit faster from hurt animation
+    hurtDuration = 0.4f; // Strikers recover a bit faster from hurt animation
     loadSpecificAssets();
     setState(EnemyState::Idle); // Set initial state after loading assets
     attackCooldownTimer.restart();
@@ -131,11 +131,17 @@ void Striker::updateAI(float deltaTime, Player& player) {
 
     // Now decide what to do next: Attack or Run
     float distanceToPlayer = magnitude(playerPos - position); // True distance
+    bool canAttack = attackCooldownTimer.getElapsedTime().asSeconds() >= attackInterval;
 
-    if (distanceToPlayer < attackRange && attackCooldownTimer.getElapsedTime().asSeconds() >= attackInterval) {
+    if (distanceToPlayer < attackRange && canAttack) {
         std::cout << "Striker DECIDED to ATTACK" << std::endl;
         setState(EnemyState::Attacking);
         attackCooldownTimer.restart(); // Restart timer because we just initiated an attack
+    } 
+    // Idle state if player is within attack range but not ready to attack
+    else if (distanceToPlayer < attackRange) {
+        setState(EnemyState::Idle);
+        velocity.x = 0;
     }
     else {
         setState(EnemyState::Running);

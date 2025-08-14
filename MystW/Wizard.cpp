@@ -14,11 +14,11 @@ const std::map<EnemyState, AnimSheetInfo> Wizard::wizardAnimSheetInfos = {
 };
 
 Wizard::Wizard(const std::string& assetBaseFolder, float startX, float startY)
-    : Enemy(startX, startY, 30, 125.0f), // Base constructor: x, y, max health, speed
+    : Enemy(startX, startY, 1, 125.0f), // Base constructor: x, y, max health, speed
     baseAssetPath(assetBaseFolder),
-    spellInterval(3.0f), // Wizard attacks every 1.5 second
+    spellInterval(3.0f), // Wizard attacks every 3 second
     spellRange(700.0f),  // Wizard attacks if player is within 200px
-    meleeInterval(1.0f), // Melee attack every 1 second
+    meleeInterval(0.2f), // Melee attack every 0.2 second
     meleeRange(300.0f),
     detectionRange(900.0f),
     spellFrameSize(64, 88),
@@ -28,7 +28,7 @@ Wizard::Wizard(const std::string& assetBaseFolder, float startX, float startY)
     damageDealtInCurAttack(false)
 {
     baseScale = 1.75f;
-    hurtDuration = 0.8f;
+    hurtDuration = 0.3f;
     loadSpecificAssets();
     setState(EnemyState::Idle); // Set initial state after loading assets
     attackCooldownTimer.restart();
@@ -150,7 +150,7 @@ void Wizard::updateAI(float deltaTime, Player& player) {
         setState(EnemyState::Attacking);
         attackCooldownTimer.restart(); // Restart timer because we just initiated an attack
     }
-    else if (distanceToPlayer < meleeRange) {
+    else if (distanceToPlayer > meleeRange && distanceToPlayer < detectionRange) {
         setState(EnemyState::Running);
         velocity.x = direction * speed; //*deltaTime; // Move in the facing direction
     }

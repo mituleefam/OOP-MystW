@@ -245,13 +245,28 @@
     <Image Include="image\icon\home_icon.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="image\backgroundGame\background_2.png">
+    <Image Include="image\backgroundGame1\background_2.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="image\backgroundGame\background_1.png">
+    <Image Include="image\backgroundGame1\background_1.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="image\backgroundGame\background_0.png">
+    <Image Include="image\backgroundGame1\background_0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame2\background_0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame2\background_1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame2\background_2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\tile\tileset1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\tile\tileset2.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

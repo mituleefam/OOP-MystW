@@ -139,11 +139,11 @@ void Enemy::animate(float deltaTime) {
             }
             else {
                 currentFrame = frameCount - 1;
-                if (currentState >= EnemyState::Attacking && currentState <= EnemyState::Healing) {
-                    setState(EnemyState::Idle); // Quay về Idle sau khi tấn công/hành động xong
-                }
                 if (currentState == EnemyState::Dying) {
                     isAlive = false; // Đánh dấu là đã chết hẳn sau khi animation kết thúc
+                }
+                else if (currentState >= EnemyState::Attacking && currentState <= EnemyState::Healing) {
+                    setState(EnemyState::Idle); // Quay về Idle sau khi tấn công/hành động xong
                 }
             }
         }
@@ -218,7 +218,7 @@ void Enemy::adjustSpriteOriginAndScale() {
 
 
 bool Enemy::isDead() const {
-    return !isAlive && currentState == EnemyState::Dying; //&& currentFrame >= static_cast<int>(animations.at(EnemyState::Dying).frames.size()) - 1;
+    return !isAlive;
     // A more robust check for "completely finished dying and can be removed"
 }
 

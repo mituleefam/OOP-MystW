@@ -4,14 +4,14 @@
 #include "TileSets.h"
 #include "PausePage.hpp"
 #include <iostream>
-// ADDED: Include specific enemy types you want to create
 #include "EnemyFactory.h"
 
 GameState::GameState(StateManager* sm): states(sm)
 {
 	win = states->getWindow();
 	float maxHP = 100;
-	background.loadStage("image/backgroundGame", *win);
+	// XÓA PHẦN LOAD BACKGROUND Ở ĐÂY, VÌ NÓ SẼ ĐƯỢC LOAD TRONG loadLevel()
+	//background.loadStage("image/backgroundGame", *win);
 	pauseTex.loadFromFile("image/icon/pause_icon.png");
 	sf::Vector2f viewSize = (*states->getUiView()).getSize();
 	float scaleX = viewSize.x / 800.f;
@@ -34,8 +34,9 @@ GameState::GameState(StateManager* sm): states(sm)
 
 	const unsigned int TILE_SIZE = 32;
 
+	/*
 	// Load tileset trước để lấy kích thước
-	if (!tileSet.load("image/tile/tileset.png", "map1.csv", TILE_SIZE, win->getView().getSize())) {
+	if (!tileSet.load("image/tile/tileset1.png", "map1.csv", TILE_SIZE, win->getView().getSize())) {
 		std::cout << "Failed to load tileset!" << std::endl;
 	}
 
@@ -50,11 +51,12 @@ GameState::GameState(StateManager* sm): states(sm)
 
 	// BẮT ĐẦU GAME VỚI LEVEL 1
 	loadLevel(1);
+	*/ // This will be done in loadLevel()
 
 	// Player
 	player.Initialize();
 	player.Load();
-	player.setPosition(200, 600);
+	//player.setPosition(200, 600); // This will be done in loadLevel()
 
 	loadEnemies();
 
@@ -74,6 +76,10 @@ GameState::GameState(StateManager* sm): states(sm)
 	debugCollisionPoint.setRadius(4.f);
 	debugCollisionPoint.setFillColor(sf::Color::Green);
 	debugCollisionPoint.setOrigin(4.f, 4.f);
+
+
+	// START WITH LEVEL 1
+	loadLevel(1);
 }
 
 
@@ -201,7 +207,7 @@ void GameState::update(float delta)
 			++it;
 		}
 	}
-	if (enemies.empty() && currentLevel <= 2) {
+	if (enemies.empty()) {
 		// All enemies defeated, trigger level transition
 		loadNextLevel();
 	}
@@ -213,10 +219,10 @@ void GameState::update(float delta)
 
 void GameState::render(sf::RenderWindow& window)
 {
+	// 1. DRAW GAME WORLD
 	// window.clear();
 	window.setView(*states->getUiView()); // << ĐÂY LÀ BƯỚC QUAN TRỌNG NHẤT
 	background.draw(window);
-	// ---ADDED: Camera Character ---
 	camera.applyTo(window);
 	// Draw order is important: background first, then map, then entities
 	window.draw(tileSet);
@@ -242,7 +248,7 @@ void GameState::render(sf::RenderWindow& window)
 		debugCollisionPoint.setPosition(hb.left, hb.top + hb.height); window.draw(debugCollisionPoint);
 	}
 
-	// Draw UI on top of everything
+	// 2. Draw UI on top of everything
 	window.setView(*states->getUiView()); // << ĐÂY LÀ BƯỚC QUAN TRỌNG NHẤT
 	pause.render(window);
 	hp->draw(window);
@@ -258,19 +264,16 @@ void GameState::loadEnemies() {
 	enemies.clear();
 	if (currentLevel == 1)
 	{
-		enemies.emplace_back(EnemyFactory::createEnemy("Elf", 2000.0f, 900.0f));
-		enemies.emplace_back(EnemyFactory::createEnemy("Striker", 3000.0f, 900.0f));
-		enemies.emplace_back(EnemyFactory::createEnemy("Wizard", 2400.0f, 900.0f));
-		//enemies.emplace_back(EnemyFactory::createEnemy("LeafBoss", 2400.0f, 900.0f));
-		//enemies.emplace_back(EnemyFactory::createEnemy("WaterBoss", 2400.0f, 900.0f));
+		enemies.emplace_back(EnemyFactory::createEnemy("Elf", 2400.0f, 900.0f));
+		//enemies.emplace_back(EnemyFactory::createEnemy("Striker", 3000.0f, 900.0f));
 	}
 	else if (currentLevel == 2)
 	{
-		enemies.emplace_back(EnemyFactory::createEnemy("Wizard", 1000.0f, 900.0f));
+		enemies.emplace_back(EnemyFactory::createEnemy("Wizard", 2400.0f, 900.0f));
 	}
 	else if (currentLevel == 3)
 	{
-		enemies.emplace_back(EnemyFactory::createEnemy("LeafBoss", 2400.0f, 900.0f));
+		//enemies.emplace_back(EnemyFactory::createEnemy("LeafBoss", 2400.0f, 900.0f));
 		enemies.emplace_back(EnemyFactory::createEnemy("WaterBoss", 2400.0f, 900.0f));
 	}
 	// Add more as needed
@@ -283,10 +286,15 @@ void GameState::loadLevel(int level) {
 	// Tạo tên file map dựa trên level
 	std::string mapFile = "map" + std::to_string(level) + ".csv";
 	std::string collisionFile = "Collision" + std::to_string(level) + ".csv";
-
+	std::string backgroundPath = "image/backgroundGame" + std::to_string(level);
+	background.loadStage(backgroundPath, *win);
 	// Load map và collision cho level mới
-	if (!tileSet.load("image/tile/tileset.png", mapFile, 32, win->getView().getSize())) {
+	std::string tileSetFile = "image/tile/tileset" + std::to_string(level) + ".png";
+	if (!tileSet.load(tileSetFile, mapFile, 32, win->getView().getSize())) {
 		std::cout << "Failed to load tileset for level " << level << std::endl;
+		// Có thể xử lý lỗi ở đây, ví dụ quay về menu
+		states->popState();
+		return;
 	}
 	collisionLayer.load(collisionFile, 32);
 
@@ -303,7 +311,7 @@ void GameState::loadLevel(int level) {
 }
 
 void GameState::loadNextLevel() {
-	const int MAX_LEVELS = 2; // Ví dụ game của bạn có 2 level
+	const int MAX_LEVELS = 3;
 
 	if (currentLevel < MAX_LEVELS) {
 		// Load level tiếp theo
@@ -315,9 +323,10 @@ void GameState::loadNextLevel() {
 
 		// Lưu điểm cuối cùng vào high score
 		ScoreManager::addScore(scoreManager.getScore());
-
-		// Quay về Menu chính
-		states->popState(); // Xóa GameState hiện tại
-		// Tùy chọn: có thể push một state "You Win" vào đây
+		// WinState
+		states->pushState(std::make_unique<WinState>(states));
+		AudioManager::getInstance()->playWinMusic();
+		//// Quay về Menu chính
+		//states->popState();
 	}
 }

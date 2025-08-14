@@ -8,7 +8,7 @@
 namespace fs = std::filesystem;
 
 WaterBoss::WaterBoss(const std::string& assetFolder, float startX, float startY)
-	: Enemy(startX, startY, 90, 200.0f), // postion (x,y), health, speed
+	: Enemy(startX, startY, 1, 200.0f), // postion (x,y), health, speed
     baseAssetPath(assetFolder),
     damageDealtInAttack(false),
     isDefending(false),
@@ -160,7 +160,7 @@ void WaterBoss::performAttackLogic(Player& player) {
     case EnemyState::Attacking:
         if (currentFrame == 4) {
             if (getHitBox().intersects(player.getHitBox())) {
-                player.takeDamage(10);
+                player.takeDamage(5);
                 damageDealtInAttack = true;
             }
         }
@@ -168,7 +168,7 @@ void WaterBoss::performAttackLogic(Player& player) {
     case EnemyState::Attacking2:
         if (currentFrame == 5) {
             if (getHitBox().intersects(player.getHitBox())) {
-                player.takeDamage(10);
+                player.takeDamage(5);
                 damageDealtInAttack = true;
             }
         }
@@ -176,7 +176,7 @@ void WaterBoss::performAttackLogic(Player& player) {
     case EnemyState::Attacking3:
         if (currentFrame == 4) {
             if (getHitBox().intersects(player.getHitBox())) {
-                player.takeDamage(10);
+                player.takeDamage(5);
                 damageDealtInAttack = true;
             }
         }
@@ -203,11 +203,11 @@ void WaterBoss::animate(float deltaTime) {
             }
             else {
                 currentFrame = anim.textureFrames.size() - 1;
-                if (currentState >= EnemyState::Attacking && currentState <= EnemyState::Healing) {
-                    setState(EnemyState::Idle);
-                }
                 if (currentState == EnemyState::Dying) {
                     isAlive = false;
+                }
+                else if (currentState >= EnemyState::Attacking && currentState <= EnemyState::Healing) {
+                    setState(EnemyState::Idle);
                 }
             }
         }

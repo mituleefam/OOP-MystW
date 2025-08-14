@@ -8,7 +8,7 @@
 namespace fs = std::filesystem;
 
 LeafBoss::LeafBoss(const std::string& assetFolder, float startX, float startY)
-    : Enemy(startX, startY, 100, 110.0f), // postion (x,y), health, speed
+    : Enemy(startX, startY, 1, 110.0f), // postion (x,y), health, speed
     baseAssetPath(assetFolder),
     currentAttackType(LeafAttackType::None),
     actionTriggeredInState(false),
@@ -216,11 +216,11 @@ void LeafBoss::animate(float deltaTime) {
             }
             else {
                 currentFrame = anim.textureFrames.size() - 1;
-                if (currentState >= EnemyState::Attacking && currentState <= EnemyState::Rolling) {
-                    setState(EnemyState::Idle);
-                }
                 if (currentState == EnemyState::Dying) {
                     isAlive = false;
+                }
+                else if (currentState >= EnemyState::Attacking && currentState <= EnemyState::Rolling) {
+                    setState(EnemyState::Idle);
                 }
             }
         }
@@ -288,5 +288,16 @@ void LeafBoss::shootProjectile(LeafAttackType type, const sf::Vector2f& target) 
 
 int LeafBoss::getAttackDamage(LeafAttackType type) const {
     // Trả về sát thương dựa trên loại tấn công
-    return 10;
+    switch (type) {
+    case LeafAttackType::Melee:
+        return 5;
+
+    case LeafAttackType::EntangleArrow:
+        return 4;
+
+    case LeafAttackType::Rain:
+        return 3;
+    default:
+        return 2; 
+    }
 }
