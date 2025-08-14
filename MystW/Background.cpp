@@ -66,8 +66,8 @@ void ManageLayer::loadStage(const std::string& folderPath, sf::RenderWindow& win
 {
     layers.clear();
     // Hệ số parallax sẽ giảm dần cho các lớp phía sau
-    float baseFactor = 0.7f;
-    float factorStep = 0.2f;
+    float baseFactor = 0.5f;
+    float factorStep = 0.1f;
     int layerIndex = 0;
     std::list<std::string> imagePath;
 
