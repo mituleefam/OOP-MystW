@@ -5,6 +5,7 @@
 SoundPage::SoundPage(StateManager* sm) : states(sm)
 {
 	win = states->getWindow();
+	curVol = AudioManager::getInstance()->getGlobalVolume();
 
 	sf::Vector2f viewSize = win->getView().getSize();
 
@@ -87,6 +88,7 @@ void SoundPage::update(float delta) {
 		curVol = ((mouseX - barX) / barWidth) * 100.0f;
 		sliderKnob.setPosition(barX + (curVol / 100.0f) * barWidth, sliderKnob.getPosition().y);
 		track.setSize({ curVol / 100.0f * slideBar.getSize().x , 8.f*scaleY });
+		AudioManager::getInstance()->setGlobalVolume(curVol);
 	}
 	exit.applyHoverEffect(*win);
 }
@@ -104,13 +106,6 @@ void SoundPage::render(sf::RenderWindow& window)
 	font.loadFromFile("font/Roboto.ttf");
 	float scaleX = 1920.0f / 800.0f;
 	float scaleY = 1080.0f / 600.0f;
-	sf::Text final;
-	final.setFont(font);
-	final.setCharacterSize(70);
-	final.setFillColor(sf::Color(255, 215, 0));
-	final.setString("Press Esc to out");
-	final.setPosition(260 * scaleX, (150 + 3 * 60 + 60) * scaleY);
-	window.draw(final);
 	exit.render(window);
 
 }
