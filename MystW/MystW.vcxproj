@@ -152,6 +152,7 @@
     <ClInclude Include="MenuState.hpp" />
     <ClInclude Include="PausePage.hpp" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="RewardState.h" />
     <ClInclude Include="ScoreManager.hpp" />
     <ClInclude Include="SoundPage.hpp" />
     <ClInclude Include="SpellEffect.h" />

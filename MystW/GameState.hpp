@@ -7,6 +7,7 @@
 #include "Button.hpp"
 #include "TileSets.h"
 #include "CollisionLayer.hpp"
+#include "RewardState.h"
 #include "Player.h" // ADDED: Include the Player header
 #include "Enemy.h"  // ADDED: Include the base Enemy header
 #include <vector>   // ADDED: To hold enemies
@@ -35,7 +36,6 @@ private:
 	//Hoang's properies
 	CollisionLayer collisionLayer;
 	Tileset tileSet;
-
 	// --- ADDED: Game Entities ---
 	Player player; // The main player object
 	std::vector<std::unique_ptr<Enemy>> enemies; // A list to hold all enemies

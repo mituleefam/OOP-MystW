@@ -3,8 +3,11 @@
 #include "Camera.h"
 #include "TileSets.h"
 #include "PausePage.hpp"
+#include "AudioManager.hpp"  // ADDED: Missing include for AudioManager
 #include <iostream>
 #include "EnemyFactory.h"
+#include <sstream>           // ADDED: Missing include for stringstream
+#include <iomanip>           // ADDED: Missing include for setw/setfill
 
 GameState::GameState(StateManager* sm): states(sm)
 {
@@ -34,29 +37,9 @@ GameState::GameState(StateManager* sm): states(sm)
 
 	const unsigned int TILE_SIZE = 32;
 
-	/*
-	// Load tileset trước để lấy kích thước
-	if (!tileSet.load("image/tile/tileset1.png", "map1.csv", TILE_SIZE, win->getView().getSize())) {
-		std::cout << "Failed to load tileset!" << std::endl;
-	}
-
-	// Load collision
-	collisionLayer.load("Collision1.csv", TILE_SIZE);
-
-	// Bây giờ mới lấy được kích thước map từ tileset
-	float mapWidth = tileSet.getMapWidth() * TILE_SIZE;
-	float mapHeight = tileSet.getMapHeight() * TILE_SIZE;
-
-	camera = Camera(viewSize, sf::Vector2f(mapWidth, mapHeight)); // Gán lại sau khi có kích thước
-
-	// BẮT ĐẦU GAME VỚI LEVEL 1
-	loadLevel(1);
-	*/ // This will be done in loadLevel()
-
 	// Player
 	player.Initialize();
 	player.Load();
-	//player.setPosition(200, 600); // This will be done in loadLevel()
 
 	loadEnemies();
 
@@ -77,39 +60,35 @@ GameState::GameState(StateManager* sm): states(sm)
 	debugCollisionPoint.setFillColor(sf::Color::Green);
 	debugCollisionPoint.setOrigin(4.f, 4.f);
 
-
 	// START WITH LEVEL 1
 	loadLevel(1);
 }
 
-
-
-
 void GameState::handleEvent(sf::Event& event)
 {
-
 	// This function primarily handles events that happen once, like key presses
 	if (event.type == sf::Event::KeyPressed)
 	{
-		// Removed isAClicked and isDClicked, as we will handle continuous movement in update()
 		if (event.key.code == sf::Keyboard::Escape)
 		{
-			// states->pushState(std::make_unique<PausePage>(states, win));
 			states->pushState(std::make_unique<PausePage>(states));
+			return; // FIXED: Prevent duplicate pause state pushes
 		}
 	}
 
-	if (pause.isClicked(*win, event) || event.key.code == sf::Keyboard::Escape)
+	// FIXED: Removed duplicate escape key check
+	if (pause.isClicked(*win, event))
 	{
 		std::cout << "Pause is clicked \n";
-		// states->pushState(std::make_unique<PausePage>(states,win));
 		states->pushState(std::make_unique<PausePage>(states));
 	}
+	
 	if (scoreManager.getScore() == 100)
 	{
 		states->pushState(std::make_unique<WinState>(states));
 		AudioManager::getInstance()->playWinMusic();
 	}
+	
 	if (player.health == 0)
 	{
 		states->pushState(std::make_unique<LoseState>(states));
@@ -300,19 +279,18 @@ void GameState::loadNextLevel() {
 	const int MAX_LEVELS = 3;
 
 	if (currentLevel < MAX_LEVELS) {
-		// Load level tiếp theo
-		loadLevel(currentLevel + 1);
+		if (currentLevel == 1) {
+			loadLevel(currentLevel + 1);
+		}
+		else if (currentLevel == 2) {
+			loadLevel(currentLevel + 1);
+			states->pushState(std::make_unique<RewardState>(states, &player.getSpirit()));
+		}
 	}
 	else {
-		// Đã hoàn thành tất cả các level!
 		std::cout << "Congratulations! You have completed the game!" << std::endl;
-
-		// Lưu điểm cuối cùng vào high score
 		ScoreManager::addScore(scoreManager.getScore());
-		// WinState
 		states->pushState(std::make_unique<WinState>(states));
 		AudioManager::getInstance()->playWinMusic();
-		//// Quay về Menu chính
-		//states->popState();
 	}
 }
