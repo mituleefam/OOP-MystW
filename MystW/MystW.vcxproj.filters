@@ -251,9 +251,6 @@
     <Image Include="image\backgroundGame1\background_1.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="image\backgroundGame1\background_0.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="image\backgroundGame2\background_0.png">
       <Filter>Resource Files</Filter>
     </Image>
@@ -267,6 +264,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="image\tile\tileset2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame1\background_3.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

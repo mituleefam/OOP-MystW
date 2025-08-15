@@ -60,6 +60,8 @@ void Player::Initialize()
     float hitboxLeft = (50.f - hitboxWidth) / 2.f; // Căn giữa theo chiều ngang
     float hitboxTop = (37.f - hitboxHeight);      // Đặt ở dưới cùng
     localHitbox = sf::FloatRect(hitboxLeft, hitboxTop, hitboxWidth, hitboxHeight);
+
+    spirit.loadAssets();
 }
 void Player::Load()
 {

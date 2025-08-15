@@ -119,23 +119,28 @@ void GameState::handleEvent(sf::Event& event)
 
 void GameState::update(float delta)
 {
-	// --- Update Player ---
-	player.Update(delta, collisionLayer);
-	sf::Vector2f pos = player.getPosition();
-	if (pos.x < 0.f) {
-		player.setPosition(0.f, pos.y); // hoặc player.setX(pos.x);
+	// 1. Update tất cả enemy trước
+	for (auto& enemy : enemies) {
+		enemy->update(delta, player, collisionLayer);
 	}
 
+	// 2. Update player
+	player.Update(delta, collisionLayer);
+
+	// 3. Update Spirit (dùng vị trí player mới và enemy mới nhất)
+	player.getSpirit().update(delta, player.getPosition(), enemies);
+
+	// 4. Giữ player trong map
+	sf::Vector2f pos = player.getPosition();
+	if (pos.x < 0.f) {
+		player.setPosition(0.f, pos.y);
+	}
+
+	// 5. Update camera và background
 	camera.follow(player.getPosition());
-	// --- Link Player Movement to Background Scrolling ---
-	// The background should scroll opposite to the player's movement
-	//if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || isAClicked)
-	//	background.update(delta, 'A');
-	//if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || isDClicked)
-	//	background.update(delta, 'D');
-	// GỌI HÀM UPDATE MỚI CỦA BACKGROUND
-	// Truyền vào tâm của camera
 	background.update(camera.getView().getCenter());
+
+	// 6. Update timer text
 	sf::Time elapsed = gameClock.getElapsedTime();
 	int totalSeconds = static_cast<int>(elapsed.asSeconds());
 	int minutes = totalSeconds / 60;
@@ -146,19 +151,17 @@ void GameState::update(float delta)
 		<< std::setw(2) << std::setfill('0') << seconds;
 	timerText.setString(ss.str());
 
-	if (player.isAttacked == true)
-	{
+	// 7. Update máu player khi bị tấn công
+	if (player.isAttacked) {
 		hp->setCurrentHealth(player.health);
 		player.isAttacked = false;
 	}
 
-	for (auto it = enemies.begin(); it != enemies.end(); ) {
-		Enemy* currentEnemy = it->get(); // Get raw pointer for convenience
+	// 8. Xử lý enemy chết hoặc bị player đánh
+	for (auto it = enemies.begin(); it != enemies.end();) {
+		Enemy* currentEnemy = it->get();
 
-		//currentEnemy->update(delta, player.getPosition(), player.getHitBox(), collisionLayer);
-		currentEnemy->update(delta, player, collisionLayer);
-
-		if (currentEnemy->isDead()) { // isDead() should mean "animation finished and can be removed"
+		if (currentEnemy->isDead()) {
 			if (currentLevel == 1)
 				scoreManager.incrementScore(5);
 			else if (currentLevel == 2)
@@ -167,55 +170,32 @@ void GameState::update(float delta)
 			std::cout << "Enemy removed from game." << std::endl;
 		}
 		else {
-			// Player attacks enemy
-			if (player.isAttacking && !player.attackRegistered && !currentEnemy->checkIsHurting() && player.getAttackBounds().intersects(currentEnemy->getHitBox())) {
-				currentEnemy->takeDamage(1); // Example damage amount
+			if (player.isAttacking && !player.attackRegistered &&
+				!currentEnemy->checkIsHurting() &&
+				player.getAttackBounds().intersects(currentEnemy->getHitBox()))
+			{
+				currentEnemy->takeDamage(1);
 				player.attackRegistered = true;
 				std::cout << "Player attacked enemy!" << std::endl;
-				// Death check after player attack is implicitly handled by enemy's own update/isDead next iteration
 			}
-
-			// Enemy attacks player
-			//if (Elf* elf = dynamic_cast<Elf*>(currentEnemy)) {
-			//	if (elf->checkArrowCollisions(player.getHitBox())) {
-			//		player.takeDamage(5);
-			//		elf->removeArrowsCollidingWith(player.getHitBox());
-			//		std::cout << "Player hit by Elf arrow!" << std::endl;
-			//	}
-			//}
-			//if (Striker* striker = dynamic_cast<Striker*>(currentEnemy)) {
-			//	if (striker->attackRegistered && !striker->damageDealtThisAttack) {
-			//		player.takeDamage(5);
-			//		striker->damageDealtThisAttack = true;
-			//		std::cout << "Player hit by Striker!" << std::endl;
-			//	}
-			//}
-			//if (Wizard* wizard = dynamic_cast<Wizard*>(currentEnemy)) {
-			//	if (wizard->checkSpellCollisions(player.getHitBox())) {
-			//		player.takeDamage(10); // Ví dụ sát thương của spell
-			//		wizard->onSpellHit(); // cancel the spell right after it hits
-			//	}
-			//	else if (wizard->getCurrentState() == EnemyState::Attacking2 && wizard->attackRegistered) {
-			//		// Giả sử đòn cận chiến cũng chỉ gây sát thương 1 lần
-			//		// (bạn sẽ cần thêm cờ damageDealtThisAttack cho wizard nếu cần)
-			//		player.takeDamage(5);
-			//		wizard->attackRegistered = false; // Tạm thời reset ngay để tránh loop
-			//	}
-			//}
-			// The enemy now damages the player from within its own updateAI function.
-			// No need for dynamic_cast or calling dealDamage here.
 			++it;
 		}
 	}
+
+	// 9. Check qua màn
 	if (enemies.empty()) {
-		// All enemies defeated, trigger level transition
-		loadNextLevel();
+		float mapWidthPixels = tileSet.getMapWidth() * 32;
+		if (player.getRightEdge() >= mapWidthPixels - 0.5f) {
+			std::cout << "Trigger next level!" << std::endl;
+			loadNextLevel();
+		}
 	}
+
+	// 10. Update UI
 	pause.applyHoverEffect(*win);
 	scoreText.setString("Score: " + std::to_string(scoreManager.getScore()));
-	//isAClicked = false;
-	//isDClicked = false;
 }
+
 
 void GameState::render(sf::RenderWindow& window)
 {
@@ -229,6 +209,7 @@ void GameState::render(sf::RenderWindow& window)
 
 	// --- ADDED: Draw the player and enemies ---
 	player.Draw(window); // Assuming Player has a Draw method that draws its sprite on the window
+	player.getSpirit().draw(window);
 	for (const auto& enemy : enemies) {
 		enemy->draw(window);
 		// VẼ HITBOX CỦA ENEMY RA MÀN HÌNH
@@ -305,6 +286,11 @@ void GameState::loadLevel(int level) {
 	float mapWidth = tileSet.getMapWidth() * 32;
 	float mapHeight = tileSet.getMapHeight() * 32;
 	camera = Camera(win->getView().getSize(), sf::Vector2f(mapWidth, mapHeight));
+
+	//LoadSpirit
+	if (level == 3) {
+		player.getSpirit().activate();
+	}
 
 	// Load enemy cho level mới
 	loadEnemies();

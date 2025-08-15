@@ -1,5 +1,6 @@
 #pragma once
 #include "Enemy.h"
+#include "Spirit.h" 
 #include <SFML/Graphics.hpp>
 #include "CollisionLayer.hpp" // ADDED: Forward-declare or include
 
@@ -42,11 +43,27 @@ private:
 	// Unused variables for future use
     const float knockbackForce = 1.0f; // Force applied when the player is attacked
     sf::FloatRect localHitbox;
+    //Spirit
+    Spirit spirit;
 public:
     int health = 100; // Player health
-
+    Spirit& getSpirit() { return spirit; }
     sf::Sprite sprite;
-    sf::Vector2f getPosition() const { return sprite.getPosition(); } // Get player position
+    sf::Vector2f getPosition() const {
+        return sf::Vector2f(
+            sprite.getPosition().x + getHitBox().width / 2.0f,
+            sprite.getPosition().y + getHitBox().height / 2.0f
+        );
+    } // Get player position
+
+    float getRightEdge() const {
+        sf::FloatRect hb = getHitBox();
+        return hb.left + hb.width;
+    }
+
+    float getLeftEdge() const {
+        return getHitBox().left;
+    }
     void setPosition(float x, float y) { sprite.setPosition(x, y); } // Set player position
     sf::FloatRect getBounds() const { return sprite.getGlobalBounds(); }
     sf::FloatRect getHitBox() const; // Get the hitbox of the player for collision detection
