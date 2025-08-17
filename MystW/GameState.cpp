@@ -266,6 +266,11 @@ void GameState::loadLevel(int level) {
 	float mapHeight = tileSet.getMapHeight() * 32;
 	camera = Camera(win->getView().getSize(), sf::Vector2f(mapWidth, mapHeight));
 
+	// In thông tin kích thước map để kiểm tra
+	std::cout << "Loaded Level: " << currentLevel << std::endl;
+	std::cout << "TileSet Dimensions: Width = " << tileSet.getMapWidth() << ", Height = " << tileSet.getMapHeight() << std::endl;
+	std::cout << "Map Pixel Dimensions: Width = " << mapWidth << ", Height = " << mapHeight << std::endl;
+
 	//LoadSpirit
 	if (level == 3) {
 		player.getSpirit().activate();

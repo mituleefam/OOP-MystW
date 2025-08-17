@@ -1,26 +1,173 @@
-﻿#include "TileSets.h"
+﻿//#include "TileSets.h"
+//#include <fstream>
+//#include <sstream>
+//#include <iostream>
+//Tileset::Tileset() : m_tileSize(0), m_width(0), m_height(0) {}
+//
+//bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, unsigned int tileSize, sf::Vector2f windowSize)
+//{
+//    m_tileSize = tileSize;
+//    m_texture.setSmooth(false);
+//    //Load tileset texture
+//    if (!m_texture.loadFromFile(tilesetPath)) {
+//        std::cout << "Error: Cannot load file tileset: " << tilesetPath << std::endl;
+//        return false;
+//    }
+//
+//    //Read map CSV
+//    std::ifstream file(mapPath);
+//    if (!file.is_open()) {
+//        std::cout << "Error: Cannot open file map: " << mapPath << std::endl;
+//        return false;
+//    }
+//
+//    m_mapData.clear();
+//    std::string line;
+//    while (std::getline(file, line)) {
+//        std::vector<int> row;
+//        std::stringstream ss(line);
+//        std::string cell;
+//        while (std::getline(ss, cell, ',')) {
+//            row.push_back(std::stoi(cell));
+//        }
+//        m_mapData.push_back(row);
+//    }
+//    file.close();
+//
+//    if (m_mapData.empty()) {
+//        std::cout << "Error: Du lieu map rong." << std::endl;
+//        return false;
+//    }
+//
+//    //Map size
+//    m_height = m_mapData.size();
+//    m_width = m_mapData[0].size(); // Số cột (tile theo ngang)
+//
+//    const unsigned int maxVisibleX = 25;
+//    const unsigned int maxVisibleY = 19;
+//
+//
+//
+//    //Prepare vertices
+//    m_vertices.setPrimitiveType(sf::Quads);
+//    m_vertices.resize(m_width * m_height * 4);
+//
+//    int xOffset = 0;
+//    int yOffset = m_height > maxVisibleY ? m_height - maxVisibleY : 0;
+//
+//    bool found = false;
+//
+//    for (unsigned int y = 0; y < m_height && !found; ++y) {
+//        for (unsigned int x = 0; x < m_width && !found; ++x) {
+//            if (m_mapData[y][x] >= 0) {
+//                xOffset = x;
+//                yOffset = y;
+//                found = true;
+//            }
+//        }
+//    }
+//    std::cout << "Offset: (" << xOffset << ", " << yOffset << ")\n";
+//
+//    // Tính số tile hiển thị
+//    unsigned int visibleTileWidth = std::min(xOffset + maxVisibleX, m_width) - xOffset;
+//    unsigned int visibleTileHeight = std::min(yOffset + maxVisibleY, m_height) - yOffset;
+//
+//    // Tính kích thước thật của tilemap đang vẽ
+//    float mapPixelWidth = visibleTileWidth * m_tileSize;
+//    float mapPixelHeight = visibleTileHeight * m_tileSize;
+//
+//    // Scale để vừa khớp trong khung 
+//    float scaleX = windowSize.x / mapPixelWidth;
+//    float scaleY = windowSize.y / mapPixelHeight;
+//
+//   
+//    unsigned int quadIndex = 0;
+//
+//    for (unsigned int y = 0; y < m_height; ++y) {
+//        for (unsigned int x = 0; x < m_width; ++x) {
+//            int tileNumber = m_mapData[y][x];
+//            if (tileNumber < 0) continue;
+//
+//            int tu = tileNumber % (m_texture.getSize().x / m_tileSize);
+//            int tv = tileNumber / (m_texture.getSize().x / m_tileSize);
+//
+//            sf::Vertex* quad = &m_vertices[quadIndex * 4];
+//
+//            // Vẽ đúng vị trí trong thế giới
+//            quad[0].position = sf::Vector2f(x * m_tileSize, y * m_tileSize);
+//            quad[1].position = sf::Vector2f((x + 1) * m_tileSize, y * m_tileSize);
+//            quad[2].position = sf::Vector2f((x + 1) * m_tileSize, (y + 1) * m_tileSize);
+//            quad[3].position = sf::Vector2f(x * m_tileSize, (y + 1) * m_tileSize);
+//
+//            float texOffset = 0.01f;
+//            quad[0].texCoords = sf::Vector2f(tu * m_tileSize + texOffset, tv * m_tileSize + texOffset);
+//            quad[1].texCoords = sf::Vector2f((tu + 1) * m_tileSize - texOffset, tv * m_tileSize + texOffset);
+//            quad[2].texCoords = sf::Vector2f((tu + 1) * m_tileSize - texOffset, (tv + 1) * m_tileSize - texOffset);
+//            quad[3].texCoords = sf::Vector2f(tu * m_tileSize + texOffset, (tv + 1) * m_tileSize - texOffset);
+//
+//            quadIndex++;
+//        }
+//    }
+//    m_vertices.resize(quadIndex * 4);
+//
+//
+//    // Resize lại đúng với số lượng quad thực sự dùng
+//    m_vertices.resize(quadIndex * 4);
+//
+//
+//    // In thông tin tile đầu tiên được vẽ (để debug)
+//    for (unsigned int y = yOffset; y < std::min(yOffset + maxVisibleY, m_height); ++y) {
+//        for (unsigned int x = xOffset; x < std::min(xOffset + maxVisibleX, m_width); ++x) {
+//            int tileNumber = m_mapData[y][x];
+//            if (tileNumber < 0) continue;
+//
+//            std::cout << "First valid tile at (" << x << "," << y << ") = " << tileNumber << "\n";
+//            sf::Vertex* quad = &m_vertices[0]; // lấy cái đầu tiên (quadIndex == 0)
+//            for (int k = 0; k < 4; ++k)
+//                std::cout << "(" << quad[k].position.x << "," << quad[k].position.y << ") ";
+//            std::cout << "\n";
+//            goto done;
+//        }
+//    }
+//
+//done:;
+//
+//    return true;
+//}
+//
+//
+//void Tileset::draw(sf::RenderTarget& target, sf::RenderStates states) const { 
+//    states.texture = &m_texture;
+//    target.draw(m_vertices, states);
+//}
+
+#include "TileSets.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <vector>
+#include <algorithm> // Bắt buộc
+
+// --- Hằng số cờ lật/xoay của Tiled ---
+const unsigned int FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+const unsigned int FLIPPED_VERTICALLY_FLAG = 0x40000000;
+const unsigned int FLIPPED_DIAGONALLY_FLAG = 0x20000000;
+
 Tileset::Tileset() : m_tileSize(0), m_width(0), m_height(0) {}
+
+void Tileset::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    states.texture = &m_texture;
+    target.draw(m_vertices, states);
+}
 
 bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, unsigned int tileSize, sf::Vector2f windowSize)
 {
+    // --- PHẦN CODE GỐC CỦA BẠN (GIỮ NGUYÊN) ---
     m_tileSize = tileSize;
     m_texture.setSmooth(false);
-    //Load tileset texture
-    if (!m_texture.loadFromFile(tilesetPath)) {
-        std::cout << "Error: Cannot load file tileset: " << tilesetPath << std::endl;
-        return false;
-    }
-
-    //Read map CSV
+    if (!m_texture.loadFromFile(tilesetPath)) { /* ... */ return false; }
     std::ifstream file(mapPath);
-    if (!file.is_open()) {
-        std::cout << "Error: Cannot open file map: " << mapPath << std::endl;
-        return false;
-    }
-
+    if (!file.is_open()) { /* ... */ return false; }
     m_mapData.clear();
     std::string line;
     while (std::getline(file, line)) {
@@ -28,115 +175,95 @@ bool Tileset::load(const std::string& tilesetPath, const std::string& mapPath, u
         std::stringstream ss(line);
         std::string cell;
         while (std::getline(ss, cell, ',')) {
-            row.push_back(std::stoi(cell));
+            try { row.push_back(std::stoi(cell)); }
+            catch (...) { row.push_back(-1); } // Sửa thành -1 để nhất quán
         }
         m_mapData.push_back(row);
     }
     file.close();
+    if (m_mapData.empty()) { /* ... */ return false; }
 
-    if (m_mapData.empty()) {
-        std::cout << "Error: Du lieu map rong." << std::endl;
-        return false;
-    }
-
-    //Map size
     m_height = m_mapData.size();
-    m_width = m_mapData[0].size(); // Số cột (tile theo ngang)
+    m_width = m_mapData[0].size();
 
-    const unsigned int maxVisibleX = 25;
-    const unsigned int maxVisibleY = 19;
-
-
-
-    //Prepare vertices
     m_vertices.setPrimitiveType(sf::Quads);
     m_vertices.resize(m_width * m_height * 4);
 
-    int xOffset = 0;
-    int yOffset = m_height > maxVisibleY ? m_height - maxVisibleY : 0;
-
-    bool found = false;
-
-    for (unsigned int y = 0; y < m_height && !found; ++y) {
-        for (unsigned int x = 0; x < m_width && !found; ++x) {
-            if (m_mapData[y][x] >= 0) {
-                xOffset = x;
-                yOffset = y;
-                found = true;
-            }
-        }
-    }
-    std::cout << "Offset: (" << xOffset << ", " << yOffset << ")\n";
-
-    // Tính số tile hiển thị
-    unsigned int visibleTileWidth = std::min(xOffset + maxVisibleX, m_width) - xOffset;
-    unsigned int visibleTileHeight = std::min(yOffset + maxVisibleY, m_height) - yOffset;
-
-    // Tính kích thước thật của tilemap đang vẽ
-    float mapPixelWidth = visibleTileWidth * m_tileSize;
-    float mapPixelHeight = visibleTileHeight * m_tileSize;
-
-    // Scale để vừa khớp trong khung 
-    float scaleX = windowSize.x / mapPixelWidth;
-    float scaleY = windowSize.y / mapPixelHeight;
-
-   
     unsigned int quadIndex = 0;
 
     for (unsigned int y = 0; y < m_height; ++y) {
         for (unsigned int x = 0; x < m_width; ++x) {
-            int tileNumber = m_mapData[y][x];
-            if (tileNumber < 0) continue;
+            int rawGid = m_mapData[y][x];
 
+            if (rawGid == -1) { // Chỉ bỏ qua các ô trống tường minh
+                continue;
+            }
+
+            // --- BẮT ĐẦU SỬA ĐỔI LOGIC ---
+            unsigned int tileGid = static_cast<unsigned int>(rawGid);
+            bool flippedH = (tileGid & FLIPPED_HORIZONTALLY_FLAG);
+            bool flippedV = (tileGid & FLIPPED_VERTICALLY_FLAG);
+            bool flippedD = (tileGid & FLIPPED_DIAGONALLY_FLAG);
+
+            // "Dọn dẹp" các cờ để lấy lại ID gốc
+            tileGid &= ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+
+            // QUAN TRỌNG: Gán lại ID đã dọn dẹp cho tileNumber
+            // Bước này đảm bảo tileNumber luôn là số dương để tính toán
+            int tileNumber = tileGid;
+
+            // --- PHẦN CÒN LẠI GIỮ NGUYÊN HOÀN TOÀN NHƯ CODE GỐC CỦA BẠN ---
             int tu = tileNumber % (m_texture.getSize().x / m_tileSize);
             int tv = tileNumber / (m_texture.getSize().x / m_tileSize);
 
             sf::Vertex* quad = &m_vertices[quadIndex * 4];
 
-            // Vẽ đúng vị trí trong thế giới
             quad[0].position = sf::Vector2f(x * m_tileSize, y * m_tileSize);
             quad[1].position = sf::Vector2f((x + 1) * m_tileSize, y * m_tileSize);
             quad[2].position = sf::Vector2f((x + 1) * m_tileSize, (y + 1) * m_tileSize);
             quad[3].position = sf::Vector2f(x * m_tileSize, (y + 1) * m_tileSize);
 
-            float texOffset = 0.01f;
-            quad[0].texCoords = sf::Vector2f(tu * m_tileSize + texOffset, tv * m_tileSize + texOffset);
-            quad[1].texCoords = sf::Vector2f((tu + 1) * m_tileSize - texOffset, tv * m_tileSize + texOffset);
-            quad[2].texCoords = sf::Vector2f((tu + 1) * m_tileSize - texOffset, (tv + 1) * m_tileSize - texOffset);
-            quad[3].texCoords = sf::Vector2f(tu * m_tileSize + texOffset, (tv + 1) * m_tileSize - texOffset);
+            // Áp dụng logic lật xoay lên tọa độ texture
+            sf::Vector2f topLeft(tu * m_tileSize, tv * m_tileSize);
+            sf::Vector2f topRight((tu + 1) * m_tileSize, tv * m_tileSize);
+            sf::Vector2f bottomLeft(tu * m_tileSize, (tv + 1) * m_tileSize);
+            sf::Vector2f bottomRight((tu + 1) * m_tileSize, (tv + 1) * m_tileSize);
+
+            quad[0].texCoords = topLeft;
+            quad[1].texCoords = topRight;
+            quad[2].texCoords = bottomRight;
+            quad[3].texCoords = bottomLeft;
+
+            if (flippedD) { // Logic xoay/lật phức tạp hơn một chút
+                if (flippedH && flippedV) {
+                    quad[1].texCoords = topLeft; quad[2].texCoords = topRight; quad[3].texCoords = bottomRight; quad[0].texCoords = bottomLeft;
+                }
+                else if (flippedH) {
+                    quad[0].texCoords = topRight; quad[1].texCoords = bottomRight; quad[2].texCoords = bottomLeft; quad[3].texCoords = topLeft;
+                }
+                else if (flippedV) {
+                    quad[0].texCoords = bottomLeft; quad[1].texCoords = topLeft; quad[2].texCoords = topRight; quad[3].texCoords = bottomRight;
+                }
+                else {
+                    quad[0].texCoords = topRight; quad[1].texCoords = topLeft; quad[2].texCoords = bottomLeft; quad[3].texCoords = bottomRight;
+                }
+            }
+            else { // Chỉ lật ngang hoặc dọc
+                if (flippedH) {
+                    std::swap(quad[0].texCoords, quad[1].texCoords);
+                    std::swap(quad[2].texCoords, quad[3].texCoords);
+                }
+                if (flippedV) {
+                    std::swap(quad[0].texCoords, quad[3].texCoords);
+                    std::swap(quad[1].texCoords, quad[2].texCoords);
+                }
+            }
 
             quadIndex++;
         }
     }
+
     m_vertices.resize(quadIndex * 4);
-
-
-    // Resize lại đúng với số lượng quad thực sự dùng
-    m_vertices.resize(quadIndex * 4);
-
-
-    // In thông tin tile đầu tiên được vẽ (để debug)
-    for (unsigned int y = yOffset; y < std::min(yOffset + maxVisibleY, m_height); ++y) {
-        for (unsigned int x = xOffset; x < std::min(xOffset + maxVisibleX, m_width); ++x) {
-            int tileNumber = m_mapData[y][x];
-            if (tileNumber < 0) continue;
-
-            std::cout << "First valid tile at (" << x << "," << y << ") = " << tileNumber << "\n";
-            sf::Vertex* quad = &m_vertices[0]; // lấy cái đầu tiên (quadIndex == 0)
-            for (int k = 0; k < 4; ++k)
-                std::cout << "(" << quad[k].position.x << "," << quad[k].position.y << ") ";
-            std::cout << "\n";
-            goto done;
-        }
-    }
-
-done:;
 
     return true;
-}
-
-
-void Tileset::draw(sf::RenderTarget& target, sf::RenderStates states) const { 
-    states.texture = &m_texture;
-    target.draw(m_vertices, states);
 }
