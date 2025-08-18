@@ -8,7 +8,7 @@
 namespace fs = std::filesystem;
 
 WaterBoss::WaterBoss(const std::string& assetFolder, float startX, float startY)
-	: Enemy(startX, startY, 1, 200.0f), // postion (x,y), health, speed
+	: Enemy(startX, startY, 20, 200.0f), // postion (x,y), health, speed
     baseAssetPath(assetFolder),
     damageDealtInAttack(false),
     isDefending(false),

@@ -14,7 +14,7 @@ const std::map<EnemyState, AnimSheetInfo> Striker::strikerAnimSheetInfos = {
 };
 
 Striker::Striker(const std::string& assetBaseFolder, float startX, float startY)
-    : Enemy(startX, startY, 1, 120.0f), // Base constructor: x, y, max health, speed
+    : Enemy(startX, startY, 12, 120.0f), // Base constructor: x, y, max health, speed
     baseAssetPath(assetBaseFolder),
     attackInterval(1.f), // Striker attacks every second
     attackRange(160.0f)  // Striker attacks if player is within 170px

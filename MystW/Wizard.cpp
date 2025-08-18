@@ -14,7 +14,7 @@ const std::map<EnemyState, AnimSheetInfo> Wizard::wizardAnimSheetInfos = {
 };
 
 Wizard::Wizard(const std::string& assetBaseFolder, float startX, float startY)
-    : Enemy(startX, startY, 1, 125.0f), // Base constructor: x, y, max health, speed
+    : Enemy(startX, startY, 7, 125.0f), // Base constructor: x, y, max health, speed
     baseAssetPath(assetBaseFolder),
     spellInterval(3.0f), // Wizard attacks every 3 second
     spellRange(700.0f),  // Wizard attacks if player is within 200px

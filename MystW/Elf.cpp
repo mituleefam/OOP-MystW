@@ -14,7 +14,7 @@ const std::map<EnemyState, AnimSheetInfo> Elf::elfAnimSheetInfos = {
 };
 
 Elf::Elf(const std::string& assetBaseFolder, float startX, float startY)
-    : Enemy(startX, startY, 1, 50.0f), // Base constructor: x, y, max health, speed
+    : Enemy(startX, startY, 5, 50.0f), // Base constructor: x, y, max health, speed
     baseAssetPath(assetBaseFolder),
     shootInterval(1.2f), // Elf shoots every 0.8 second
     attackRange(700.0f)  // Elf attacks if player is within 700px

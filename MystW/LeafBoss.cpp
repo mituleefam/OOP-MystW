@@ -8,7 +8,7 @@
 namespace fs = std::filesystem;
 
 LeafBoss::LeafBoss(const std::string& assetFolder, float startX, float startY)
-    : Enemy(startX, startY, 1, 110.0f), // postion (x,y), health, speed
+    : Enemy(startX, startY, 20, 110.0f), // postion (x,y), health, speed
     baseAssetPath(assetFolder),
     currentAttackType(LeafAttackType::None),
     actionTriggeredInState(false),
