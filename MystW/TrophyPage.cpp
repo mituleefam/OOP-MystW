@@ -10,8 +10,8 @@ TrophyPage::TrophyPage(StateManager* sm) : states(sm)
 	float scaleY = 1080.0f / 600.0f;
 
 	exitTex.loadFromFile("image/icon/exit.png");
-	exit.setIcon(exitTex, 590.f * scaleX, 130.f * scaleY, 24.0f * scaleX);
-	exit.setShape(590.f * scaleX, 130.f * scaleY, 25.f * scaleX, 30.f * scaleY);
+	exit.setIcon(exitTex, 585.f * scaleX, 130.f * scaleY, 24.0f * scaleX);
+	exit.setShape(585.f * scaleX, 130.f * scaleY, 25.f * scaleX, 30.f * scaleY);
 
 	trophyBox.setSize(sf::Vector2f(1000, 600));
 	trophyBox.setFillColor(sf::Color(250, 243, 224, 255));
@@ -51,13 +51,7 @@ TrophyPage::TrophyPage(StateManager* sm) : states(sm)
 		text.setPosition(300*scaleX, (150 + i * 60 + 60)*scaleY);
 		scoreText.push_back(text);
 	}
-	sf::Text final;
-	final.setFont(font);
-	final.setCharacterSize(70);
-	final.setFillColor(sf::Color(255, 215, 0));
-	final.setString("Press Esc to out");
-	final.setPosition(260 * scaleX, (150 + 3 * 60 + 60) * scaleY);
-	scoreText.push_back(final);
+
 }
 
 void TrophyPage::handleEvent(sf::Event& event)
