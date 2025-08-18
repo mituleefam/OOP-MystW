@@ -1,4 +1,4 @@
-#include "SoundPage.hpp"
+﻿#include "SoundPage.hpp"
 #include <iostream>
 
 //SoundPage::SoundPage(StateManager* sm, sf::RenderWindow* window) : states(sm), win(window)
@@ -13,8 +13,8 @@ SoundPage::SoundPage(StateManager* sm) : states(sm)
 	auto scaleY = viewSize.y / 600.f;
 
 	exitTex.loadFromFile("image/icon/exit.png");
-	exit.setIcon(exitTex, 580.f * scaleX, 130.f * scaleY, 24.0f * scaleX);
-	exit.setShape(580.f * scaleX, 130.f * scaleY, 25.f * scaleX, 30.f * scaleY);
+	exit.setIcon(exitTex, 575.f * scaleX, 150.f * scaleY, 24.0f * scaleX);
+	exit.setShape(575.f * scaleX, 150.f * scaleY, 25.f * scaleX, 30.f * scaleY);
 
 	if (!volOn.loadFromFile("image/icon/volumeOn_icon.png"))
 		std::cout << "Cannot load volume on \n";
@@ -65,6 +65,24 @@ void SoundPage::handleEvent(sf::Event& event)
 			isDragging = true;
 			sliderKnob.setFillColor(sf::Color(245, 245, 245));
 		}
+		if (volumeOn.getGlobalBounds().contains(mousePos))
+		{
+			if (curVol > 0) 
+			{
+				prevVol = curVol; 
+				curVol = 0;    
+			}
+			else 
+			{
+				curVol = (prevVol > 0) ? prevVol : 50.0f;
+			}
+
+			AudioManager::getInstance()->setGlobalVolume(curVol);
+			float barX = slideBar.getPosition().x;
+			float barWidth = slideBar.getSize().x;
+			sliderKnob.setPosition(barX + (curVol / 100.0f) * barWidth, sliderKnob.getPosition().y);
+			track.setSize({ (curVol / 100.0f) * barWidth, slideBar.getSize().y });
+		}
 	}
 	if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
 	{
@@ -74,6 +92,8 @@ void SoundPage::handleEvent(sf::Event& event)
 
 	if (exit.isClicked(*win, event))
 		states->popState();
+
+
 }
 
 void SoundPage::update(float delta) {

@@ -17,7 +17,7 @@ private:
 	bool isExitClicked = false;
 	Button exit;
 	sf::Texture exitTex;
-
+	float prevVol = 50.0f;
 	float curVol = 50.0f;
 	float minVol = 0.f;
 	float maxVol = 100.0f;
