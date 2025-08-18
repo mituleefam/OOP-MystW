@@ -286,10 +286,12 @@ void GameState::loadNextLevel() {
 	if (currentLevel < MAX_LEVELS) {
 		if (currentLevel == 1) {
 			loadLevel(currentLevel + 1);
+			AudioManager::getInstance()->playGameMusic2();
 		}
 		else if (currentLevel == 2) {
 			loadLevel(currentLevel + 1);
 			states->pushState(std::make_unique<RewardState>(states, &player.getSpirit()));
+			AudioManager::getInstance()->playGameMusic3();
 		}
 	}
 	else {

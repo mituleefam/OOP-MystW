@@ -56,7 +56,7 @@ void WinState::update(float delta)
 	{
 		isRestartClicked = false;
 		states->pushState(std::make_unique<GameState>(states));
-		AudioManager::getInstance()->playGameMusic();
+		AudioManager::getInstance()->playGameMusic1();
 		return;
 	}
 
