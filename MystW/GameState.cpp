@@ -193,16 +193,17 @@ void GameState::loadEnemies() {
 	if (currentLevel == 1)
 	{
 		enemies.emplace_back(EnemyFactory::createEnemy("Elf", 2400.0f, 900.0f));
-		//enemies.emplace_back(EnemyFactory::createEnemy("Striker", 3000.0f, 900.0f));
+		enemies.emplace_back(EnemyFactory::createEnemy("Striker", 1000.0f, 800.0f));
 	}
 	else if (currentLevel == 2)
 	{
-		enemies.emplace_back(EnemyFactory::createEnemy("Wizard", 2400.0f, 900.0f));
+		enemies.emplace_back(EnemyFactory::createEnemy("Wizard", 3000.0f, 900.0f));
+		enemies.emplace_back(EnemyFactory::createEnemy("Striker", 2400.0f, 900.0f));
 	}
 	else if (currentLevel == 3)
 	{
-		//enemies.emplace_back(EnemyFactory::createEnemy("LeafBoss", 2400.0f, 900.0f));
-		enemies.emplace_back(EnemyFactory::createEnemy("WaterBoss", 2400.0f, 900.0f));
+		enemies.emplace_back(EnemyFactory::createEnemy("LeafBoss", 2400.0f, 900.0f));
+		enemies.emplace_back(EnemyFactory::createEnemy("WaterBoss", 3000.0f, 900.0f));
 	}
 	// Add more as needed
 	std::cout << "Enemies loaded for level " << currentLevel << std::endl;
