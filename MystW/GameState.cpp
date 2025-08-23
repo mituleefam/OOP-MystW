@@ -3,18 +3,16 @@
 #include "Camera.h"
 #include "TileSets.h"
 #include "PausePage.hpp"
-#include "AudioManager.hpp"  // ADDED: Missing include for AudioManager
+#include "AudioManager.hpp" 
 #include <iostream>
 #include "EnemyFactory.h"
-#include <sstream>           // ADDED: Missing include for stringstream
-#include <iomanip>           // ADDED: Missing include for setw/setfill
+#include <sstream>           
+#include <iomanip>          
 
 GameState::GameState(StateManager* sm): states(sm)
 {
 	win = states->getWindow();
 	float maxHP = 100;
-	// XÓA PHẦN LOAD BACKGROUND Ở ĐÂY, VÌ NÓ SẼ ĐƯỢC LOAD TRONG loadLevel()
-	//background.loadStage("image/backgroundGame", *win);
 	pauseTex.loadFromFile("image/icon/pause_icon.png");
 	sf::Vector2f viewSize = (*states->getUiView()).getSize();
 	float scaleX = viewSize.x / 800.f;
@@ -51,15 +49,6 @@ GameState::GameState(StateManager* sm): states(sm)
 	// Đặt vị trí cho text ở góc trên bên phải
 	scoreText.setPosition(1920.f - 300.f, 20.f);
 
-	// CẤU HÌNH CHO DEBUG HITBOX
-	debugHitbox.setFillColor(sf::Color::Transparent);
-	debugHitbox.setOutlineColor(sf::Color::Red);
-	debugHitbox.setOutlineThickness(2.0f);
-	// Cấu hình cho điểm debug
-	debugCollisionPoint.setRadius(4.f);
-	debugCollisionPoint.setFillColor(sf::Color::Green);
-	debugCollisionPoint.setOrigin(4.f, 4.f);
-
 	// START WITH LEVEL 1
 	loadLevel(1);
 }
@@ -72,7 +61,7 @@ void GameState::handleEvent(sf::Event& event)
 		if (event.key.code == sf::Keyboard::Escape)
 		{
 			states->pushState(std::make_unique<PausePage>(states));
-			return; // FIXED: Prevent duplicate pause state pushes
+			return; 
 		}
 	}
 
@@ -179,47 +168,26 @@ void GameState::update(float delta)
 void GameState::render(sf::RenderWindow& window)
 {
 	// 1. DRAW GAME WORLD
-	// window.clear();
-	window.setView(*states->getUiView()); // << ĐÂY LÀ BƯỚC QUAN TRỌNG NHẤT
+	window.setView(*states->getUiView()); 
 	background.draw(window);
 	camera.applyTo(window);
-	// Draw order is important: background first, then map, then entities
 	window.draw(tileSet);
 
 	// --- ADDED: Draw the player and enemies ---
-	player.Draw(window); // Assuming Player has a Draw method that draws its sprite on the window
+	player.Draw(window); 
 	player.getSpirit().draw(window);
 	for (const auto& enemy : enemies) {
 		enemy->draw(window);
-		// VẼ HITBOX CỦA ENEMY RA MÀN HÌNH
-		sf::FloatRect hb = enemy->getHitBox();
-		debugHitbox.setSize(sf::Vector2f(hb.width, hb.height));
-		debugHitbox.setPosition(hb.left, hb.top);
-		window.draw(debugHitbox);
-
-		// === VẼ CÁC ĐIỂM KIỂM TRA VA CHẠM ===
-		// Điểm bên phải
-		debugCollisionPoint.setPosition(hb.left + hb.width, hb.top); window.draw(debugCollisionPoint);
-		debugCollisionPoint.setPosition(hb.left + hb.width, hb.top + hb.height / 2); window.draw(debugCollisionPoint);
-		debugCollisionPoint.setPosition(hb.left + hb.width, hb.top + hb.height); window.draw(debugCollisionPoint);
-		// Điểm bên trái
-		debugCollisionPoint.setPosition(hb.left, hb.top); window.draw(debugCollisionPoint);
-		debugCollisionPoint.setPosition(hb.left, hb.top + hb.height / 2); window.draw(debugCollisionPoint);
-		debugCollisionPoint.setPosition(hb.left, hb.top + hb.height); window.draw(debugCollisionPoint);
 	}
 
 	// 2. Draw UI on top of everything
-	window.setView(*states->getUiView()); // << ĐÂY LÀ BƯỚC QUAN TRỌNG NHẤT
+	window.setView(*states->getUiView()); 
 	pause.render(window);
 	hp->draw(window);
 	window.draw(timerText);
-	// Ví dụ sau này có thể vẽ thêm:
-	// scoreText.draw(window);
 	window.draw(scoreText);
-	// healthBar.draw(window);
 }
 
-// ADDED: Implementation for loading enemies
 void GameState::loadEnemies() {
 	enemies.clear();
 	if (currentLevel == 1)
@@ -243,7 +211,6 @@ void GameState::loadEnemies() {
 void GameState::loadLevel(int level) {
 	currentLevel = level;
 
-	// Tạo tên file map dựa trên level
 	std::string mapFile = "map" + std::to_string(level) + ".csv";
 	std::string collisionFile = "Collision" + std::to_string(level) + ".csv";
 	std::string backgroundPath = "image/backgroundGame" + std::to_string(level);
@@ -252,14 +219,13 @@ void GameState::loadLevel(int level) {
 	std::string tileSetFile = "image/tile/tileset" + std::to_string(level) + ".png";
 	if (!tileSet.load(tileSetFile, mapFile, 32, win->getView().getSize())) {
 		std::cout << "Failed to load tileset for level " << level << std::endl;
-		// Có thể xử lý lỗi ở đây, ví dụ quay về menu
 		states->popState();
 		return;
 	}
 	collisionLayer.load(collisionFile, 32);
 
 	// Reset vị trí người chơi
-	player.setPosition(200, 600); // Hoặc vị trí bắt đầu của từng màn
+	player.setPosition(200, 600); 
 
 	// Reset camera
 	float mapWidth = tileSet.getMapWidth() * 32;

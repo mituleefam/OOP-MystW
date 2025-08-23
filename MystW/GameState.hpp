@@ -54,7 +54,7 @@ private:
 	sf::Texture groundTexture;
 	sf::Sprite groundSprite;
 
-	sf::RectangleShape debugHitbox;
+	//sf::RectangleShape debugHitbox;
 	sf::CircleShape debugCollisionPoint;
 public:
 	GameState(StateManager* sm);

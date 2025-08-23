@@ -53,7 +53,6 @@ void Player::Initialize()
 	dieFrames[4] = sf::IntRect(200, 333, 50, 37);
 	dieFrames[5] = sf::IntRect(250, 333, 50, 37);
 
-    // ĐỊNH NGHĨA HITBOX GỐC Ở ĐÂY (dựa trên kích thước frame 50x37)
     // Tinh chỉnh các giá trị này cho đến khi bạn hài lòng
     float hitboxWidth = 20.f;
     float hitboxHeight = 35.f;
@@ -83,7 +82,6 @@ void Player::Load()
 
 void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
 {
-    // --- BƯỚC 1: CẬP NHẬT CÁC BỘ ĐẾM THỜI GIAN ---
     // Luôn chạy đầu tiên, không phụ thuộc vào trạng thái của nhân vật.
     if (hurtCooldown > 0.0f) {
         hurtCooldown -= deltaTime;
@@ -94,8 +92,7 @@ void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
         if (attackCooldown < 0.0f) attackCooldown = 0.0f;
     }
 
-    // --- BƯỚC 2: XÁC ĐỊNH TRẠNG THÁI HIỆN TẠI (STATE DETERMINATION) ---
-    // Đây là logic cốt lõi, hoạt động theo thứ tự ưu tiên để tránh xung đột.
+
     // Ưu tiên 1: Chết (Die)
     if (health <= 0) {
         animState = AnimationState::Die;
@@ -298,22 +295,6 @@ void Player::Draw(sf::RenderWindow& window)
 {
 	window.draw(sprite);
 	sf::FloatRect hitbox = getHitBox();
-	sf::RectangleShape box;
-	box.setPosition(hitbox.left, hitbox.top);
-	box.setSize(sf::Vector2f(hitbox.width, hitbox.height));
-	box.setFillColor(sf::Color(255, 0, 0, 100));
-	window.draw(box);
-
-    // === THÊM ĐOẠN NÀY ĐỂ VẼ HITBOX TẤN CÔNG ===
-    // Chỉ vẽ khi đang ở trạng thái tấn công
-    if (animState == AnimationState::Attacking || animState == AnimationState::AirAttacking) {
-        sf::RectangleShape attackBox;
-        sf::FloatRect attackHitbox = getAttackBounds();
-        attackBox.setPosition(attackHitbox.left, attackHitbox.top);
-        attackBox.setSize(sf::Vector2f(attackHitbox.width, attackHitbox.height));
-        attackBox.setFillColor(sf::Color(0, 255, 0, 150)); // Màu xanh cho tấn công
-        window.draw(attackBox);
-    }
 }
 sf::FloatRect Player::getAttackBounds() const {
 	float width = 50.f;
