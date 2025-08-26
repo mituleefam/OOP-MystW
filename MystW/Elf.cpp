@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "Math.h" // For normalizeVector, assuming it's in Math.h
 #include <iostream> // For debugging
-//#include <filesystem> // For file operations if needed, though not directly used in this snippet (C++17 or later)
+
 const float VERTICAL_TOLERANCE = 50.0f; // Khoảng cách Y tối đa để coi là "cùng tầng"
 // Define the static member for Elf animation info
 const std::map<EnemyState, AnimSheetInfo> Elf::elfAnimSheetInfos = {
@@ -85,9 +85,6 @@ void Elf::update(float deltaTime, Player& player, const CollisionLayer& collisio
     }
     arrows.erase(std::remove_if(arrows.begin(), arrows.end(),
         [](const AnimatedProjectile& a) {
-            //sf::FloatRect b = a.getBounds();
-            //return b.left > 1920 || (b.left + b.width) < 0 ||
-            //    b.top > 1080 || (b.top + b.height) < 0;
             return a.isExpired();
         }), arrows.end());
 

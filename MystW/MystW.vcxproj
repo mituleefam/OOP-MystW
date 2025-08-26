@@ -148,7 +148,6 @@
     <ClInclude Include="LeafProjectile.h" />
     <ClInclude Include="LoseState.hpp" />
     <ClInclude Include="Math.h" />
-    <ClInclude Include="MenuScene.hpp" />
     <ClInclude Include="MenuState.hpp" />
     <ClInclude Include="PausePage.hpp" />
     <ClInclude Include="Player.h" />
@@ -192,8 +191,7 @@
     <ClCompile Include="Spirit.cpp" />
     <ClCompile Include="SpiritBullet.cpp" />
     <ClCompile Include="Striker.cpp" />
-    <ClCompile Include="test_entity.cpp" />
-    <ClCompile Include="test_UI.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Tilesets.cpp" />
     <ClCompile Include="TrophyPage.cpp" />
     <ClCompile Include="WaterBoss.cpp" />

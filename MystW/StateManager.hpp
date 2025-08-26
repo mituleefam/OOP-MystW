@@ -28,14 +28,6 @@ public:
 		return states.empty() ? nullptr : states.back().get();
 	}
 
-	//void render(sf::RenderWindow& window)
-	//{
-	//	if (states.size() >= 2)
-	//		states[states.size() - 2]->render(window); // render GameState then render pause page
-
-	//	if (!states.empty())
-	//		states.back()->render(window); // render PausePage or top page
-	//}
 	void render()
 	{
 		// Luôn clear c?a s? tr??c khi v?

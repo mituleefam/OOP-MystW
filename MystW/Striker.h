@@ -1,16 +1,6 @@
 ﻿#pragma once
 #include "Enemy.h"
 
-//// Forward declare AnimSheetInfo if it's not in a common header
-//struct AnimSheetInfo {
-//    const char* filename;
-//    int frameWidth;
-//    int frameHeight;
-//    int frameCount;
-//    float frameDuration;
-//    bool loop;
-//};
-
 class Striker : public Enemy
 {
 public:
