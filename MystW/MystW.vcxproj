@@ -216,7 +216,6 @@
     <ClCompile Include="Wizard.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Assets\readme.txt" />
     <Text Include="scores.txt" />
   </ItemGroup>
   <ItemGroup>

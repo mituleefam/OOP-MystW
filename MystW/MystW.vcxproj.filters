@@ -209,7 +209,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="scores.txt" />
-    <Text Include="Assets\readme.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="image\Menu\backgroundMenu.jpg">

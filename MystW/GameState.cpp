@@ -212,12 +212,12 @@ void GameState::loadEnemies() {
 void GameState::loadLevel(int level) {
 	currentLevel = level;
 
-	std::string mapFile = "map" + std::to_string(level) + ".csv";
-	std::string collisionFile = "Collision" + std::to_string(level) + ".csv";
+	std::string mapFile = "image/map/map" + std::to_string(level) + ".csv";
+	std::string collisionFile = "image/map/Collision" + std::to_string(level) + ".csv";
 	std::string backgroundPath = "image/backgroundGame" + std::to_string(level);
 	background.loadStage(backgroundPath, *win);
 	// Load map và collision cho level mới
-	std::string tileSetFile = "image/tile/tileset" + std::to_string(level) + ".png";
+	std::string tileSetFile = "image/map/tileset" + std::to_string(level) + ".png";
 	if (!tileSet.load(tileSetFile, mapFile, 32, win->getView().getSize())) {
 		std::cout << "Failed to load tileset for level " << level << std::endl;
 		states->popState();
