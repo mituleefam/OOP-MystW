@@ -4,16 +4,6 @@
 #include <vector>
 #include <map>
 
-//// Forward declare AnimSheetInfo if it's not in a common header
-//struct AnimSheetInfo {
-//    const char* filename;
-//    int frameWidth;
-//    int frameHeight;
-//    int frameCount;
-//    float frameDuration;
-//    bool loop;
-//};
-
 class Elf : public Enemy {
 public:
     Elf(const std::string& assetBaseFolder, float startX, float startY);
@@ -22,9 +12,9 @@ public:
     // Override virtual functions from base Enemy class
     void loadSpecificAssets() override;
     //void performAttackLogic(const sf::Vector2f& playerPos) override;
-    void performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) override;
-    void update(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) override;
-    void updateAI(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) override;
+    void performAttackLogic(Player& player) override;
+    void update(float deltaTime, Player& player, const CollisionLayer& collisionLayer) override;
+    void updateAI(float deltaTime, Player& player) override;
     void draw(sf::RenderWindow& window) override; // To draw arrows
 
     sf::FloatRect getHitBox() const override;

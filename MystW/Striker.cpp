@@ -1,30 +1,32 @@
-#include "Striker.h"
+﻿#include "Striker.h"
 #include "Player.h"
 #include "Math.h" // For normalizeVector, assuming it's in Math.h
 #include <iostream> // For debugging
-//#include <filesystem> // For file operations if needed, though not directly used in this snippet (C++17 or later)
 
+const float VERTICAL_TOLERANCE = 50.0f; // Khoảng cách Y tối đa để coi là "cùng tầng"
 // Define the static member for Striker animation info
 const std::map<EnemyState, AnimSheetInfo> Striker::strikerAnimSheetInfos = {
     { EnemyState::Idle,        { "Idle.png",   96, 84, 7, 0.15f, true  }},
     { EnemyState::Running,     { "Run.png",    96, 84, 8, 0.08f,  true  }}, // Faster run animation
     { EnemyState::Attacking,   { "Attack.png", 96, 84, 11, 0.1f, false }}, // Non-looping attack
     { EnemyState::Hurt,        { "Hurt.png",   96, 84, 4, 0.15f, false }},
-    { EnemyState::Dying,       { "Die.png",    96, 84, 12, 0.5f,  false }}
+    { EnemyState::Dying,       { "Die.png",    96, 84, 12, 0.25f,  false }}
 };
 
 Striker::Striker(const std::string& assetBaseFolder, float startX, float startY)
-    : Enemy(startX, startY, 20, 120.0f), // Base constructor: x, y, max health, speed
+    : Enemy(startX, startY, 12, 120.0f), // Base constructor: x, y, max health, speed
     baseAssetPath(assetBaseFolder),
-    attackInterval(0.8f), // Striker attacks every 0.8 second
-    attackRange(200.0f)  // Striker attacks if player is within 200px
+    attackInterval(1.f), // Striker attacks every second
+    attackRange(160.0f)  // Striker attacks if player is within 170px
 {
-	speed = 300.0f; // Override speed for Striker
+    baseScale = 3.0f;
+	speed = 500.0f; // Override speed for Striker
 
-    hurtDuration = 0.6f; // Strikers recover a bit faster from hurt animation
+    hurtDuration = 0.4f; // Strikers recover a bit faster from hurt animation
     loadSpecificAssets();
     setState(EnemyState::Idle); // Set initial state after loading assets
     attackCooldownTimer.restart();
+    damageDealtInCurAttack = false;
 }
 
 void Striker::loadSpecificAssets() {
@@ -32,7 +34,18 @@ void Striker::loadSpecificAssets() {
     for (const auto& pair : strikerAnimSheetInfos) {
         loadStateFrames(pair.first, pair.second);
     }
-
+    // === ĐỊNH NGHĨA HITBOX CHO STRIKER ===
+    const float FRAME_WIDTH = 96.f;
+    const float FRAME_HEIGHT = 84.f;
+    float hitboxWidth = 33.f;
+    float hitboxHeight = 75.f;
+    localHitbox = sf::FloatRect(
+        (FRAME_WIDTH - hitboxWidth) / 2.f, // left (tự động căn giữa)
+        FRAME_HEIGHT - hitboxHeight,         // top (tự động đặt sát đáy)
+        hitboxWidth,
+        hitboxHeight
+    );
+    // ===================================
     // Set initial sprite texture and rect from Idle state
     if (animations.count(EnemyState::Idle) && !animations[EnemyState::Idle].frames.empty()) {
         sprite.setTexture(*animations[EnemyState::Idle].sheet);
@@ -63,72 +76,90 @@ void Striker::loadStateFrames(EnemyState state, const AnimSheetInfo& info) {
     animations[state] = anim;
 }
 
-void Striker::update(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
-    // Now call the base Enemy update for normal behavior
-    Enemy::update(deltaTime, playerPos, playerHitBox);
+void Striker::update(float deltaTime, Player& player, const CollisionLayer& collisionLayer) {
+    Enemy::update(deltaTime, player, collisionLayer);
 }
 
-void Striker::updateAI(float deltaTime, const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
-    // Prevent attacking if player is dead (hitbox is zero)
-    if (playerHitBox.width == 0.f && playerHitBox.height == 0.f) {
+void Striker::updateAI(float deltaTime, Player& player) {
+
+    sf::FloatRect playerHitBox = player.getHitBox();
+    sf::FloatRect enemyHitBox = getHitBox();
+    float playerBottom = playerHitBox.top + playerHitBox.height;
+    float enemyBottom = enemyHitBox.top + enemyHitBox.height;
+
+    if (std::abs(playerBottom - enemyBottom) > VERTICAL_TOLERANCE) {
+
         setState(EnemyState::Idle);
+        velocity.x = 0;
+        return;
+    }
+
+    // Prevent attacking if player is dead
+    if (player.isDead()) { // Dòng MỚI
+        setState(EnemyState::Idle);
+        velocity.x = 0; // Đứng im khi player chết
         return;
     }
 
     // Basic AI: update facing direction, then decide to run or attack
+    //updateFacingDirection(playerPos);
+    sf::Vector2f playerPos = player.getPosition();
     updateFacingDirection(playerPos);
 
     if (currentState == EnemyState::Attacking) {
-        // The base animate() will transition to Idle when attack anim finishes if it's non-looping.
-        // performAttackLogic is responsible for the actual shot during this state if cooldown allows.
-        performAttackLogic(playerPos, playerHitBox); // Check if it can attack again
-        return; // Don't change state or move if in attack animation
+		velocity.x = 0; // Stop moving while attacking
+
+        // === NEW DAMAGE LOGIC ===
+        // Define which frame of the animation actually deals damage
+        const int HIT_FRAME = 5; // Example: damage on the 5th frame
+
+        // Check if the animation is on the hit frame AND we haven't dealt damage yet in this swing
+        if (currentFrame == HIT_FRAME && !damageDealtInCurAttack) {
+            // Now, check for collision
+            if (getHitBox().intersects(player.getHitBox())) {
+                player.takeDamage(5); // Deal damage
+                damageDealtInCurAttack = true; // Mark damage as dealt
+                std::cout << "Striker dealt damage on frame " << currentFrame << std::endl;
+            }
+        }
+        return; // Don't do other AI logic while attacking
     }
 
     // If we are not in the attacking state, the flag from any previous attack must be reset.
-    attackRegistered = false;
+    // attackRegistered = false;
+    damageDealtInCurAttack = false;
 
     // Now decide what to do next: Attack or Run
     float distanceToPlayer = magnitude(playerPos - position); // True distance
+    bool canAttack = attackCooldownTimer.getElapsedTime().asSeconds() >= attackInterval;
 
-    if (distanceToPlayer < attackRange && attackCooldownTimer.getElapsedTime().asSeconds() >= attackInterval) {
+    if (distanceToPlayer < attackRange && canAttack) {
+        std::cout << "Striker DECIDED to ATTACK" << std::endl;
         setState(EnemyState::Attacking);
         attackCooldownTimer.restart(); // Restart timer because we just initiated an attack
+    } 
+    // Idle state if player is within attack range but not ready to attack
+    else if (distanceToPlayer < attackRange) {
+        setState(EnemyState::Idle);
+        velocity.x = 0;
     }
     else {
         setState(EnemyState::Running);
-        position.x += direction * speed * deltaTime; // Move towards/away logic can be more complex
-        // For now, simple horizontal move in current direction
+        velocity.x = direction * speed;
     }
 }
 
-
-//void Striker::performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
-//    // This is called when the Striker decides to attack (e.g., when state becomes Attacking)
-//    if (attackCooldownTimer.getElapsedTime().asSeconds() >= attackInterval && !attackRegistered) {
-//        if (getHitBox().intersects(playerHitBox)) {
-//            attackRegistered = true;
-//            std::cout << "Striker attacks!\n";
-//        }
-//        attackCooldownTimer.restart();
-//    }
-//    // Reset flag when attack is done
-//    if (currentState != EnemyState::Attacking) {
-//        attackRegistered = false;
-//    }
-//}
-
-void Striker::performAttackLogic(const sf::Vector2f& playerPos, const sf::FloatRect& playerHitBox) {
-    // This is called every frame of the attack animation.
-    // We only register the hit ONCE per animation.
-    if (!attackRegistered) { // If we haven't landed a hit yet during this attack
-        if (getHitBox().intersects(playerHitBox)) {
-            attackRegistered = true;
-            // DEBUG MESSAGE TO CONFIRM HIT
-            std::cout << "Striker attack connected with player hitbox!\n";
-        }
+void Striker::performAttackLogic(Player& player) {
+    // 1. Kiểm tra va chạm
+    if (getHitBox().intersects(player.getHitBox())) {
+        attackRegistered = true; // Đánh dấu là đòn đánh đã "chạm"
     }
-    // The flag will be reset in updateAI once the state changes away from Attacking.
+
+    // 2. Chỉ gây sát thương MỘT LẦN DUY NHẤT
+    if (attackRegistered && !damageDealtInCurAttack) {
+        player.takeDamage(5);
+        damageDealtInCurAttack = true; // Đánh dấu là đã gây sát thương trong lần vung kiếm này
+    }
 }
 
 void Striker::draw(sf::RenderWindow& window) {
@@ -136,8 +167,16 @@ void Striker::draw(sf::RenderWindow& window) {
     Enemy::draw(window);
 }
 
-//bool Striker::checkAttackCollisions(const sf::FloatRect& playerHitBox) const {
-//    // Check if the striker's hitbox intersects with the player's hitbox
-//    sf::FloatRect strikerHitBox = getHitBox();
-//    return strikerHitBox.intersects(playerHitBox);
-//}
+sf::FloatRect Striker::getHitBox() const {
+    // Kích thước gốc của frame là 96x84
+    // Định nghĩa hitbox trong không gian gốc (local space)
+    float hitboxWidth = 35.f;  // Rộng 35 pixel
+    float hitboxHeight = 40.f; // Cao 40 pixel
+    float hitboxLeft = (96.f - hitboxWidth) / 2.f; // Căn giữa
+    float hitboxTop = 84.f - hitboxHeight - 23.f;         // Đặt dưới cùng
+
+    sf::FloatRect localHitbox(hitboxLeft, hitboxTop, hitboxWidth, hitboxHeight);
+
+    // Dùng phép biến đổi của sprite để lấy hitbox toàn cục
+    return sprite.getTransform().transformRect(localHitbox);
+}

@@ -1,6 +1,8 @@
 #pragma once
 #include "Enemy.h"
+#include "Spirit.h" 
 #include <SFML/Graphics.hpp>
+#include "CollisionLayer.hpp" // ADDED: Forward-declare or include
 
 class Player
 {
@@ -14,10 +16,9 @@ private:
     const float moveSpeed = 600.0f; // Speed of horizontal movement
     const float gravity = 1600.0f;
 	const float fastFallGravity = 3000.0f; // Gravity when fast falling
-    const float groundY = 700.0f; // Same as the initial position of the player sprite
 
     float attackCooldown = 0.0f; // Cooldown for attacks
-    const float attackCooldownDuration = 1.1f; // 1.1 second cooldown for attacks
+    const float attackCooldownDuration = 1.1f; // 1 second cooldown for attacks
     float hurtCooldown = 0.0f;
     const float hurtCooldownDuration = 1.0f; // 1 second of invincibility
 
@@ -38,25 +39,40 @@ private:
     sf::IntRect swordAttackingFrames[11];
     sf::IntRect hurtingFrames[3];
     sf::IntRect dieFrames[6];
-
+    float baseScale;
 	// Unused variables for future use
     const float knockbackForce = 1.0f; // Force applied when the player is attacked
-
+    sf::FloatRect localHitbox;
+    //Spirit
+    Spirit spirit;
 public:
     int health = 100; // Player health
-
+    Spirit& getSpirit() { return spirit; }
     sf::Sprite sprite;
-    //sf::Sprite spriteSheet; // For sprite sheet animations
-    sf::Vector2f getPosition() const { return sprite.getPosition(); } // Get player position
+    sf::Vector2f getPosition() const {
+        return sf::Vector2f(
+            sprite.getPosition().x + getHitBox().width / 2.0f,
+            sprite.getPosition().y + getHitBox().height / 2.0f
+        );
+    } // Get player position
+
+    float getRightEdge() const {
+        sf::FloatRect hb = getHitBox();
+        return hb.left + hb.width;
+    }
+
+    float getLeftEdge() const {
+        return getHitBox().left;
+    }
     void setPosition(float x, float y) { sprite.setPosition(x, y); } // Set player position
     sf::FloatRect getBounds() const { return sprite.getGlobalBounds(); }
     sf::FloatRect getHitBox() const; // Get the hitbox of the player for collision detection
 
-    Player() : velocity(0.0f, 0.0f) {};
+    Player() : velocity(0.0f, 0.0f), baseScale(3.5f) {};
     void Initialize(); // called once per game
     void Load(); // called once per level
-    void Update(float deltaTime); // called every frame
-    void Draw(); // called every frame after Update
+    void Update(float deltaTime, CollisionLayer& collisionLayer); // called every frame
+    void Draw(sf::RenderWindow& window);
 
     bool isJumping = false;
     bool isAttacking = false;
@@ -64,5 +80,7 @@ public:
     bool attackRegistered = false; // To prevent multiple attack registrations
     sf::FloatRect getAttackBounds() const;
     void takeDamage(int damage);
+    bool isDead() const;
+    AnimationState getAnimState() const { return animState; }
 };
 

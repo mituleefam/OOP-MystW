@@ -21,24 +21,6 @@
     <ClInclude Include="Enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameScene.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Background.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MenuScene.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PauseScene.hpp">
-		<Filter>Header Files</Filter>
-	</ClInclude>
     <ClInclude Include="Elf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -57,6 +39,84 @@
     <ClInclude Include="SpiritBullet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Striker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuScene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Background.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PausePage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundPage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="State.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StateManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrophyPage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionLayer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tilesets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpellEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Wizard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LeafProjectile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LeafBoss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterBoss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoseState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WinState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RewardState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Player.cpp">
@@ -65,22 +125,6 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-
-    <ClCompile Include="GameScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Background.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PauseScene.cpp">
-		<Filter>Source Files</Filter>
-	</ClCompile>
     <ClCompile Include="Elf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -102,5 +146,138 @@
     <ClCompile Include="SpiritBullet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Striker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Background.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PausePage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TrophyPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tilesets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpellEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Wizard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LeafProjectile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LeafBoss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterBoss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoseState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HealthBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="scores.txt" />
+    <Text Include="Assets\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="image\Menu\backgroundMenu.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\volumeOn_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\volumeOff_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\trophy_icon2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\trophy_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\sound_icon2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\sound_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\resume_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\pause_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\icon\home_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame1\background_2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame1\background_1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame2\background_0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame2\background_1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame2\background_2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\tile\tileset1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\tile\tileset2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="image\backgroundGame1\background_3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="font\Roboto.ttf" />
+    <Font Include="font\PressStart2P-Regular.ttf" />
+    <Font Include="font\Merriweather-VariableFont_opsz,wdth,wght.ttf" />
+    <Font Include="font\ManufacturingConsent-Regular.ttf" />
+    <Font Include="font\cursive.ttf" />
   </ItemGroup>
 </Project>

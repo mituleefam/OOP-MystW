@@ -3,7 +3,8 @@ AnimatedProjectile::AnimatedProjectile(const std::vector<std::shared_ptr<sf::Tex
     const sf::Vector2f& startPos,
     const sf::Vector2f& velocity,
     float frameDuration)
-    : frames(frames), velocity(velocity), frameDuration(frameDuration) {
+    : frames(frames), velocity(velocity), frameDuration(frameDuration), lifetime(2.0f) {
+    lifeTimer.restart();
     sprite.setTexture(*frames[0]);
     sprite.setPosition(startPos);
     sf::FloatRect bounds = sprite.getLocalBounds();
@@ -43,4 +44,8 @@ sf::FloatRect AnimatedProjectile::getHitBox() const {
     box.width *= (1.f - shrink);
     box.height *= (1.f - shrink);
     return box;
+}
+
+bool AnimatedProjectile::isExpired() const {
+    return lifeTimer.getElapsedTime().asSeconds() > lifetime;
 }

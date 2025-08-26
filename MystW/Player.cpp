@@ -1,5 +1,6 @@
-#include "Player.h"
+﻿#include "Player.h"
 #include <iostream>
+#include "CollisionLayer.hpp" // Include to use collision logic
 
 void Player::Initialize()
 {
@@ -51,6 +52,15 @@ void Player::Initialize()
 	dieFrames[3] = sf::IntRect(150, 333, 50, 37);
 	dieFrames[4] = sf::IntRect(200, 333, 50, 37);
 	dieFrames[5] = sf::IntRect(250, 333, 50, 37);
+
+    // Tinh chỉnh các giá trị này cho đến khi bạn hài lòng
+    float hitboxWidth = 20.f;
+    float hitboxHeight = 35.f;
+    float hitboxLeft = (50.f - hitboxWidth) / 2.f; // Căn giữa theo chiều ngang
+    float hitboxTop = (37.f - hitboxHeight);      // Đặt ở dưới cùng
+    localHitbox = sf::FloatRect(hitboxLeft, hitboxTop, hitboxWidth, hitboxHeight);
+
+    spirit.loadAssets();
 }
 void Player::Load()
 {
@@ -58,9 +68,10 @@ void Player::Load()
 	{
 		std::cout << "Player texture loaded successfully" << std::endl;
 		sprite.setTexture(textureSheet); // Set the texture to the sprite
-		sprite.setOrigin(25.0f, 18.5f); // Set the origin to the center of the sprite
-		sprite.setScale(5.0f, 5.0f); // Scale the sprite to 5x its original size
-		sprite.setPosition(150.0f, 700.0f); // Set the initial position of the player sprite
+		sprite.setOrigin(25.0f, 37.0f); // Set the origin to the center of the sprite
+        baseScale = 3.5f;
+		//sprite.setScale(2.0f, 2.0f); // Scale the sprite to 5x its original size
+		sprite.setPosition(400.0f, 1040.0f); // Set the initial position of the player sprite
 	}
 	else
 	{
@@ -69,186 +80,194 @@ void Player::Load()
 	}
 }
 
-void Player::Update(float deltaTime)
+void Player::Update(float deltaTime, CollisionLayer& collisionLayer)
 {
-	if (hurtCooldown > 0.0f) {
-		hurtCooldown -= deltaTime;
-		if (hurtCooldown < 0.0f) hurtCooldown = 0.0f;
-	}
-	if (attackCooldown > 0.0f) {
-		attackCooldown -= deltaTime;
-		if (attackCooldown < 0.0f) attackCooldown = 0.0f; // Prevent negative cooldown
-	}
+    // Luôn chạy đầu tiên, không phụ thuộc vào trạng thái của nhân vật.
+    if (hurtCooldown > 0.0f) {
+        hurtCooldown -= deltaTime;
+        if (hurtCooldown < 0.0f) hurtCooldown = 0.0f;
+    }
+    if (attackCooldown > 0.0f) {
+        attackCooldown -= deltaTime;
+        if (attackCooldown < 0.0f) attackCooldown = 0.0f;
+    }
 
-	// Track previous state to reset frame only on state change
-	static AnimationState prevAnimState = animState;
 
-	// Die animation handling
-	if (animState == AnimationState::Die) {
-		//int dieFrameCount = 6;
-		int dieFrameCount = sizeof(dieFrames) / sizeof(dieFrames[0]); // More robust frame count
-		float dieFrameDuration = frameDuration * 1.5f;
-		animationTimer += deltaTime;
-		if (currentFrame < dieFrameCount) {
-			if (animationTimer >= dieFrameDuration) {
-				animationTimer = 0.0f;
-				currentFrame++;
-			}
-			if (currentFrame < dieFrameCount)
-				sprite.setTextureRect(dieFrames[currentFrame]);
-			else if (dieFrameCount > 0) {
-				// Reset to the last frame if animation is still playing
-				sprite.setTextureRect(dieFrames[dieFrameCount - 1]);
-			}
-		}
-		velocity.x = 0.f; // Stop horizontal movement
-		return;
-	}
+    // Ưu tiên 1: Chết (Die)
+    if (health <= 0) {
+        animState = AnimationState::Die;
+    }
+    // Ưu tiên 2: Bị thương (Hurting) - **FIX QUAN TRỌNG NHẤT**
+    else if (hurtCooldown > 0.0f) {
+        animState = AnimationState::Hurting;
+        isAttacking = false; // Nếu bị đánh, hủy đòn tấn công đang thực hiện.
+    }
+    // Ưu tiên 3: Đang tấn công (Attacking)
+    else if (isAttacking) {
+        // Nếu đang tấn công, giữ nguyên trạng thái. Logic animation ở dưới sẽ xử lý việc thoát khỏi trạng thái này.
+    }
+    // Ưu tiên 4: Các trạng thái di chuyển mặc định
+    else {
+        if (isJumping) {
+            animState = AnimationState::Jumping;
+        }
+        else if (velocity.x != 0.0f) {
+            animState = AnimationState::Running;
+        }
+        else {
+            animState = AnimationState::Idle;
+        }
+    }
 
-	// 
-	if (isAttacked && animState != AnimationState::Hurting) {
-		isAttacking = false;
-		animState = AnimationState::Hurting;
-		currentFrame = 0;
-		animationTimer = 0.0f;
-		hurtCooldown = hurtCooldownDuration;
-		std::cout << "Player is attacked!" << std::endl;
-	}
 
-	// Handle input and state transitions
-	if (animState != AnimationState::Hurting && !isAttacking) {
-		velocity.x = 0.0f;
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-			velocity.x += moveSpeed;
-			isFacingRight = true;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-			velocity.x -= moveSpeed;
-			isFacingRight = false;
-		}
+    // --- BƯỚC 4: XỬ LÝ INPUT TỪ NGƯỜI DÙNG ---
+    // Chỉ nhận input nếu nhân vật không ở trong các trạng thái bận (chết, bị thương, đang tấn công).
+    velocity.x = 0.0f;
+    if (animState != AnimationState::Die && animState != AnimationState::Hurting && animState != AnimationState::Attacking) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            velocity.x = moveSpeed;
+            isFacingRight = true;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+            velocity.x = -moveSpeed;
+            isFacingRight = false;
+        }
+    }
 
-		if ((sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) && !isJumping) {
-			animState = AnimationState::Running;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && !isJumping) {
-			animState = AnimationState::Jumping;
-			velocity.y = -jumpSpeed;
-			isJumping = true;
-		}
-		else if (!isJumping) {
-			animState = AnimationState::Idle;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::J) && attackCooldown <= 0.0f) {
-			if (isJumping) {
-				animState = AnimationState::AirAttacking;
-			}
-			else {
-				animState = AnimationState::Attacking;
-			}
-			isAttacking = true;
-			attackRegistered = false;
-			attackCooldown = attackCooldownDuration;
-			currentFrame = 0;
-			animationTimer = 0.0f;
-		}
-	}
-	else {
-		velocity.x = 0.0f;
-	}
+    // --- BƯỚC 5: VẬT LÝ VÀ VA CHẠM (PHYSICS & COLLISION) ---
+    // Di chuyển ngang và xử lý va chạm tường
+    sprite.move(velocity.x * deltaTime, 0);
+    sf::FloatRect playerBounds = getHitBox();
+    int tileSize = collisionLayer.getTileSize();
+    for (float y = playerBounds.top; y < playerBounds.top + playerBounds.height; y += tileSize / 4.f) {
+        if (velocity.x > 0 && collisionLayer.isCollidable(playerBounds.left + playerBounds.width, y)) {
+            float offset = playerBounds.left - sprite.getPosition().x;
+            float newX = (std::floor((playerBounds.left + playerBounds.width) / tileSize) * tileSize) - playerBounds.width - offset - 0.1f;
+            sprite.setPosition(newX, sprite.getPosition().y);
+            velocity.x = 0;
+            break;
+        }
+        if (velocity.x < 0 && collisionLayer.isCollidable(playerBounds.left, y)) {
+            float offset = playerBounds.left - sprite.getPosition().x;
+            float newX = (std::floor(playerBounds.left / tileSize) * tileSize + tileSize) - offset + 0.1f;
+            sprite.setPosition(newX, sprite.getPosition().y);
+            velocity.x = 0;
+            break;
+        }
+    }
 
-	// ------ ANIMMATION ------
-	// Reset frame if state changed
-	if (animState != prevAnimState) {
-		currentFrame = 0;
-		prevAnimState = animState;
-	}
-	// Animation frame update
-	int frameCount = 1;
-	float actualFrameDuration = frameDuration;
-	switch (animState) {
-	case AnimationState::Idle: frameCount = 4; break;
-	case AnimationState::Running: frameCount = 6; break;
-	case AnimationState::Jumping: frameCount = 4; break;
-	case AnimationState::AirAttacking: frameCount = 7; actualFrameDuration = frameDuration * 0.3f; break;
-	case AnimationState::Attacking: frameCount = 11; actualFrameDuration = frameDuration * 0.3f; break;
-	case AnimationState::Hurting: frameCount = 3; actualFrameDuration = frameDuration * 0.4f; break;
-	}
+    // Trọng lực và di chuyển dọc
+    float currentGravity = (animState == AnimationState::AirAttacking) ? fastFallGravity : gravity;
+    velocity.y += currentGravity * deltaTime;
+    sprite.move(0, velocity.y * deltaTime);
 
-	animationTimer += deltaTime;
-	if (animationTimer >= actualFrameDuration) {
-		animationTimer = 0.0f;
-		currentFrame++;
-		if (currentFrame >= frameCount) {
-			currentFrame = 0;
-			if (animState == AnimationState::AirAttacking) {
-				isAttacking = false;
-				attackRegistered = false;
-				animState = isJumping ? AnimationState::Jumping : AnimationState::Idle;
-			}
-			if (animState == AnimationState::Attacking) {
-				isAttacking = false;
-				attackRegistered = false; // Reset for next attack
-				animState = AnimationState::Idle;
-			}
-			if (animState == AnimationState::Hurting) {
-				isAttacked = false;
-				animState = AnimationState::Idle;
-			}
-		}
-	}
+    // Xử lý va chạm sàn và cập nhật trạng thái onGround/isJumping
+    playerBounds = getHitBox();
+    bool onGround = false;
+    for (float x = playerBounds.left; x < playerBounds.left + playerBounds.width; x += tileSize / 4.f) {
+        if (velocity.y >= 0 && collisionLayer.isCollidable(x, playerBounds.top + playerBounds.height)) {
+            float offset = playerBounds.top - sprite.getPosition().y;
+            // Sửa TILE_SIZE -> tileSize ở đây
+            float newY = (std::floor((playerBounds.top + playerBounds.height) / tileSize) * tileSize) - playerBounds.height - offset;
+            sprite.setPosition(sprite.getPosition().x, newY);
+            velocity.y = 0;
+            onGround = true;
+            break;
+        }
+    }
+    isJumping = !onGround;
 
-	// Set sprite texture rect (protect against out-of-bounds)
-	switch (animState) {
-	case AnimationState::Idle:
-		sprite.setTextureRect(idleFrames[currentFrame % 4]);
-		break;
-	case AnimationState::Running:
-		sprite.setTextureRect(runningFrames[currentFrame % 6]);
-		break;
-	case AnimationState::Jumping:
-		sprite.setTextureRect(jumpingFrames[currentFrame % 4]);
-		break;
-	case AnimationState::AirAttacking:
-		sprite.setTextureRect(airAttackingFrames[currentFrame % 7]);
-		break;
-	case AnimationState::Attacking:
-		sprite.setTextureRect(swordAttackingFrames[currentFrame % 11]);
-		break;
-	case AnimationState::Hurting:
-		sprite.setTextureRect(hurtingFrames[currentFrame % 3]);
-		break;
-	default:
-		sprite.setTextureRect(idleFrames[0]);
-		break;
-	}
+    // Sau khi đã xử lý va chạm, nếu nhân vật đang chết và chạm đất thì dừng hẳn.
+    if (animState == AnimationState::Die && onGround) {
+        velocity.x = 0; // Đảm bảo không trượt ngang khi chết
+    }
 
-	// ------ PHYSICS ------
-	// Set scale and origin based on facing direction
-	float originX = isFacingRight ? 20.0f : 25.0f;
-	sprite.setOrigin(originX, 18.5f);
-	sprite.setScale(isFacingRight ? 5.0f : -5.0f, 5.0f);
+    // --- BƯỚC 6: XỬ LÝ HÀNH ĐỘNG (NHẢY, TẤN CÔNG) ---
+    // Tương tự input, chỉ cho phép hành động khi không bận.
+    if (animState != AnimationState::Die && animState != AnimationState::Hurting && animState != AnimationState::Attacking) {
+        // Nhảy
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && onGround) {
+            velocity.y = -jumpSpeed;
+        }
+        // Tấn công
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::J) && attackCooldown <= 0.0f) {
+            isAttacking = true;
+            attackCooldown = attackCooldownDuration;
+            animState = onGround ? AnimationState::Attacking : AnimationState::AirAttacking;
+            // Reset animation khi bắt đầu hành động mới
+            currentFrame = 0;
+            animationTimer = 0.0f;
 
-	// Gravity
-	if (animState == AnimationState::AirAttacking) {
-		velocity.y += fastFallGravity * deltaTime;
-	}
-	else {
-		velocity.y += gravity * deltaTime;
-	}
-	sprite.move(velocity * deltaTime);
+			attackRegistered = false; // Reset attack registered flag
+        }
+    }
 
-	// Ground collision
-	if (sprite.getPosition().y >= groundY) {
-		sprite.setPosition(sprite.getPosition().x, groundY);
-		velocity.y = 0.0f;
-		isJumping = false;
-	}
+
+    // --- BƯỚC 7: CẬP NHẬT ANIMATION ---
+    // Khối code này quyết định frame nào sẽ được hiển thị.
+    static AnimationState prevAnimState = AnimationState::Idle;
+    if (animState != prevAnimState) {
+        currentFrame = 0;
+        animationTimer = 0.0f;
+        prevAnimState = animState;
+    }
+
+    int frameCount = 1;
+    float actualFrameDuration = frameDuration;
+    switch (animState) {
+    case AnimationState::Idle:          frameCount = 4; break;
+    case AnimationState::Running:       frameCount = 6; break;
+    case AnimationState::Jumping:       frameCount = 4; break;
+    case AnimationState::AirAttacking:  frameCount = 7; actualFrameDuration = frameDuration * 0.3f; break;
+    case AnimationState::Attacking:     frameCount = 11; actualFrameDuration = frameDuration * 0.3f; break;
+    case AnimationState::Hurting:       frameCount = 3; actualFrameDuration = frameDuration * 0.4f; break;
+    case AnimationState::Die:           frameCount = 6; actualFrameDuration = frameDuration * 1.5f; break;
+    }
+
+    animationTimer += deltaTime;
+    if (animationTimer >= actualFrameDuration) {
+        animationTimer = 0.0f;
+
+        // Chỉ tăng frame nếu animation chưa kết thúc (đối với các anim không lặp lại)
+        if (!((animState == AnimationState::Die || animState == AnimationState::Hurting) && currentFrame >= frameCount - 1)) {
+            currentFrame++;
+        }
+
+        // Xử lý khi animation chạy hết một vòng
+        if (currentFrame >= frameCount) {
+            if (animState == AnimationState::Attacking || animState == AnimationState::AirAttacking) {
+                isAttacking = false; // Đánh dấu đã tấn công xong, frame sau sẽ chuyển về trạng thái di chuyển.
+            }
+            // Với Hurting và Die, chúng ta không làm gì cả, cứ giữ ở frame cuối.
+            // Các animation còn lại sẽ tự động lặp lại.
+            currentFrame = 0;
+        }
+    }
+
+    // --- BƯỚC 8: ÁP DỤNG TEXTURE VÀ HƯỚNG NHÌN CHO SPRITE ---
+    switch (animState) {
+    case AnimationState::Idle:          sprite.setTextureRect(idleFrames[currentFrame % 4]); break;
+    case AnimationState::Running:       sprite.setTextureRect(runningFrames[currentFrame % 6]); break;
+    case AnimationState::Jumping:       sprite.setTextureRect(jumpingFrames[currentFrame % 4]); break;
+    case AnimationState::AirAttacking:  sprite.setTextureRect(airAttackingFrames[currentFrame % 7]); break;
+    case AnimationState::Attacking:     sprite.setTextureRect(swordAttackingFrames[currentFrame % 11]); break;
+    case AnimationState::Hurting:       sprite.setTextureRect(hurtingFrames[currentFrame % 3]); break;
+    case AnimationState::Die:           sprite.setTextureRect(dieFrames[currentFrame >= 6 ? 5 : currentFrame]); break; // Giữ ở frame cuối
+    default:                            sprite.setTextureRect(idleFrames[0]); break;
+    }
+
+    // Cập nhật hướng nhìn của sprite
+    // Tinh chỉnh origin để sprite không bị "giật" khi quay người
+    float originX = isFacingRight ? 20.0f : 30.0f;
+    sprite.setOrigin(originX, 18.5f);
+    sprite.setScale(isFacingRight ? baseScale : -baseScale, baseScale);
 }
+
 void Player::takeDamage(int damage)
 {
 	if (hurtCooldown <= 0.0f) {
 		health -= damage;
-		isAttacked = true;
+        // isAttacked = true; // This is now redundant since we check hurtCooldown directly. We can remove it.
 		//animState = AnimationState::Hurting;
 		hurtCooldown = hurtCooldownDuration;
 
@@ -257,41 +276,37 @@ void Player::takeDamage(int damage)
 		if (health <= 0) {
 			health = 0;
 			std::cout << "Player has died!" << std::endl;
-			animState = AnimationState::Die;
-			isAttacking = false;
+            // The Update loop will now automatically handle setting the Die state
+			//animState = AnimationState::Die;
+			//isAttacking = false;
 		}
 
 		std::cout << "Player took " << damage << " damage!" << std::endl;
+        isAttacked = true;
 	}
 	else {
 		std::cout << "Player is still recovering (hurtCooldown active)!" << std::endl;
 	}
 }
 sf::FloatRect Player::getHitBox() const {
-	if (health <= 0) {
-		// Player is dead, return an empty hitbox
-		return sf::FloatRect(0, 0, 0, 0);
-	} // to stop the enemy from hitting the player when dead
-
-	sf::FloatRect box = sprite.getGlobalBounds();
-	float shrink = 0.7f; // Shrink hitbox by 70% ()
-	box.left += box.width * shrink / 2.0f;
-	box.top += box.height * shrink / 2.0f;
-	box.width *= (1.0f - shrink);
-	box.height *= (1.0f - shrink);
-	return box;
+    return sprite.getTransform().transformRect(localHitbox);
 }
-void Player::Draw()
+void Player::Draw(sf::RenderWindow& window)
 {
-
+	window.draw(sprite);
+	sf::FloatRect hitbox = getHitBox();
 }
 sf::FloatRect Player::getAttackBounds() const {
-	//     if (animState != AnimationState::Attacking)
-			 //return sf::FloatRect(); // No attack bounds if not attacking;
-			 // No need cause in main loop we check if the player is attacking before calling this function
-	float width = 10.f;
-	float height = 20.f;
+	float width = 50.f;
+	float height = 50.f;
 	sf::Vector2f pos = sprite.getPosition();
-	float offsetX = isFacingRight ? 15.f : -45.f; // 
-	return sf::FloatRect(pos.x + offsetX, pos.y - height, width, height);
+    // OffsetX: Khoảng cách từ tâm nhân vật tới điểm bắt đầu của hitbox tấn công.
+    // Nếu isFacingRight, hitbox bắt đầu ở phía trước.
+    // Nếu không, nó bắt đầu ở phía trước (bên trái), nhưng cần trừ đi cả chiều rộng của hitbox.
+	float offsetX = isFacingRight ? 20.f : -20.f - width;
+	return sf::FloatRect(pos.x + offsetX, pos.y - (height / 2.f), width, height);
+}
+
+bool Player::isDead() const {
+    return health <= 0;
 }
