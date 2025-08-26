@@ -6,7 +6,7 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "My Game", sf::Style::Default);
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "Mysterious World", sf::Style::Default);
     //sf::View fixedView(sf::FloatRect(0, 0, 1920, 1080));
     //window.setView(fixedView);
     // Đổi tên fixedView thành uiView cho rõ nghĩa.
