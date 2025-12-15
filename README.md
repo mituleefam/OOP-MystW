@@ -1,4 +1,4 @@
-# MystW - C++ OOP RPG
+# MystW - C++ RPG
 https://github.com/user-attachments/assets/f59f9559-d40e-4f69-867a-e76405a575da
 ## Introduction
 MysteriousWorld (MystW) is a simple role-playing game (RPG) developed in C++ using Object-Oriented Programming (OOP) principles. The game utilizes the SFML library to handle graphics, audio, and in-game interactions.
